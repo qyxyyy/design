@@ -48,15 +48,19 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
             return false;
         }
 
-		// 最先按路径放行：前台、静态、登录/注册（兼容 getRequestURI / getServletPath 不同返回值）
+		// 最先按路径放行：统一登录入口 / 或 /login 必须最先放行（用 URI 和 servletPath 双重判断）
 		String uri = request.getRequestURI() == null ? "" : request.getRequestURI();
 		String servletPath = request.getServletPath() == null ? "" : request.getServletPath();
+		if ("GET".equalsIgnoreCase(request.getMethod())) {
+			if ("/".equals(servletPath) || "/login".equals(servletPath)
+					|| "/".equals(uri) || "/login".equals(uri)
+					|| uri.endsWith("/login") || servletPath.endsWith("/login")) {
+				return true;
+			}
+		}
+
 		String pathInfo = request.getPathInfo() == null ? "" : request.getPathInfo();
 		String pathToCheck = (uri + " " + servletPath + " " + pathInfo).toLowerCase();
-		// 统一登录入口：/ 或 /login 直接放行，否则会返回 401 导致登录页无法打开
-		if ("/".equals(servletPath) || "/login".equals(servletPath) || pathToCheck.endsWith("/login") || pathToCheck.contains("/login ")) {
-			return true;
-		}
 		// GET 请求且路径像静态页（.html / pages / front / static）一律放行，避免注册页等被拦截
 		if ("GET".equalsIgnoreCase(request.getMethod()) && (pathToCheck.contains(".html") || pathToCheck.contains("pages") || pathToCheck.contains("front") || pathToCheck.contains("static"))) {
 			return true;

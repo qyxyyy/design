@@ -28,10 +28,13 @@ public class InterceptorConfig extends WebMvcConfigurationSupport {
 				.excludePathPatterns(
 						"/",
 						"/login",
+						"**/login",
 						"/static/**",
 						"/front/**",
 						"**/front/**",
-						prefix + "/front/**",       // 明确排除带 context-path 的前台路径
+						prefix + "/",
+						prefix + "/login",
+						prefix + "/front/**",
 						prefix + "/static/**",
 						"/zuke/register", "/huzhu/register",
 						"**/zuke/register", "**/huzhu/register",

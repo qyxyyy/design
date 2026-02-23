@@ -81,19 +81,23 @@
             <h1 class="logo" v-if="false" :style='{"padding":"5px 0","boxShadow":"0 0 6px rgba(255,0,0,.8)","borderColor":"rgba(0,0,0,.3)","backgroundColor":"#fff","borderRadius":"6px","borderWidth":"0","borderStyle":"solid"}'><img :style='{"boxShadow":"0 0 6px rgba(255,0,0,.8)","margin":"0 auto","borderColor":"rgba(0,0,0,.3)","borderRadius":"100%","borderWidth":"1px","width":"44px","borderStyle":"solid","height":"44px"}' src="http://codegen.caihongy.cn/20201024/ed5e326ca66f403aa3197b5fbb4ec733.jpg"></h1>
             
             <div class="msg-warn hide title" v-if="true" :style='{"padding":"0 10px","boxShadow":"2px 0 6px #725e82","margin":"10px auto","borderColor":"rgba(0,0,0,1)","backgroundColor":"#f7f7f7","color":"rgba(79, 151, 157, 1)","isshow":true,"borderRadius":"6px","borderWidth":"0","width":"auto","lineHeight":"32px","fontSize":"12px","borderStyle":"solid"}'>公共场所不建议自动登录，以防账号丢失</div>
-            <div :style='{"padding":"0","boxShadow":"3px 0 10px rgba(255,0,0,0)","margin":"40px","borderColor":"rgba(0,0,0,1)","backgroundColor":"#fff","borderRadius":"0","borderWidth":"0 0 1px 0","width":"80%","borderStyle":"solid","height":"64px"}' class="form-item">
-                <label v-if="false" :style='{"padding":"0 10px","boxShadow":"0 0 6px rgba(255,0,0,0)","borderColor":"rgba(0,0,0,0)","backgroundColor":"transparent","color":"#333","borderRadius":"0","textAlign":"right","borderWidth":"0","width":"84px","fontSize":"16px","borderStyle":"solid"}' class="form-label">账号</label>
+            <div :style='{"padding":"0","boxShadow":"3px 0 10px rgba(255,0,0,0)","margin":"20px 40px","borderColor":"rgba(0,0,0,1)","backgroundColor":"#fff","borderRadius":"0","borderWidth":"0 0 1px 0","width":"80%","borderStyle":"solid","height":"64px"}' class="form-item">
+                <label class="form-label" style="display:block;width:100%;margin-bottom:6px;color:#606266;font-size:14px;">账号</label>
 				<input :style='{"padding":"0 10px","boxShadow":"0 0 6px rgba(0,0,0,.5)","borderColor":"#ccc","backgroundColor":"#fff","color":"#333","borderRadius":"8px","textAlign":"left","borderWidth":"0","width":"100%","fontSize":"14px","borderStyle":"solid","height":"44px"}' type="text" name="username" required lay-verify="required" placeholder="请输入账号" autocomplete="off" class="layui-input">
             </div>
-            <div :style='{"padding":"0","boxShadow":"3px 0 10px rgba(255,0,0,0)","margin":"40px","borderColor":"rgba(0,0,0,1)","backgroundColor":"#fff","borderRadius":"0","borderWidth":"0 0 1px 0","width":"80%","borderStyle":"solid","height":"64px"}' class="form-item">
-                <label v-if="false" :style='{"padding":"0 10px","boxShadow":"0 0 6px rgba(255,0,0,0)","borderColor":"rgba(0,0,0,0)","backgroundColor":"transparent","color":"#333","borderRadius":"0","textAlign":"right","borderWidth":"0","width":"84px","fontSize":"16px","borderStyle":"solid"}' class="form-label">密码</label>
+            <div :style='{"padding":"0","boxShadow":"3px 0 10px rgba(255,0,0,0)","margin":"20px 40px","borderColor":"rgba(0,0,0,1)","backgroundColor":"#fff","borderRadius":"0","borderWidth":"0 0 1px 0","width":"80%","borderStyle":"solid","height":"64px"}' class="form-item">
+                <label class="form-label" style="display:block;width:100%;margin-bottom:6px;color:#606266;font-size:14px;">密码</label>
 				<input :style='{"padding":"0 10px","boxShadow":"0 0 6px rgba(0,0,0,.5)","borderColor":"#ccc","backgroundColor":"#fff","color":"#333","borderRadius":"8px","textAlign":"left","borderWidth":"0","width":"100%","fontSize":"14px","borderStyle":"solid","height":"44px"}' type="password" name="password" required lay-verify="required" placeholder="请输入密码" autocomplete="off" class="layui-input">
             </div>
-            <div :style='{"padding":"0","boxShadow":"0 0 6px rgba(255,0,0,0)","margin":"0 auto","borderColor":"rgba(0,0,0,1)","backgroundColor":"#fff","borderRadius":"0","borderWidth":"0 0 1px 0","width":"80%","borderStyle":"solid","height":"44px"}' class="form-item l-redio">
+            <div :style='{"padding":"8px 0","boxShadow":"0 0 6px rgba(255,0,0,0)","margin":"0 auto","borderColor":"rgba(0,0,0,1)","backgroundColor":"#fff","borderRadius":"0","borderWidth":"0 0 1px 0","width":"80%","borderStyle":"solid","minHeight":"44px"}' class="form-item l-redio">
+                <span style="display:block;margin-bottom:6px;color:#606266;font-size:14px;">请选择身份</span>
 				<input v-if="item.hasFrontLogin=='是'" v-for="(item,index) in menu" v-bind:key="index" type="radio" name="role" id="role" :value="item.tableName" :title="item.roleName">
             </div>
-			<button :style='{"padding":"0 10px","boxShadow":"0 0 6px  rgba(112, 243, 255, 0.71)","margin":"10px auto","borderColor":"rgba(21, 20, 20, 0.41)","backgroundColor":"rgba(112, 243, 255, 0.71)","color":"rgba(231, 47, 47, 1)","borderRadius":"8px","borderWidth":"1px","width":"60%","fontSize":"14px","borderStyle":"solid","height":"44px"}' class="layui-btn layui-btn-fluid layui-btn-danger btn-submit" lay-submit lay-filter="login">登录</button>
-            <p :style='{"color":"rgba(250, 0, 0, 1)","textAlign":"right","fontSize":"14px"}' class="txt"><a style="color: inherit;font-size: inherit;" v-if="item.hasFrontRegister=='是'" v-for="(item,index) in menu" v-bind:key="index" :href="'javascript:registerClick(\''+item.tableName+'\')'">注册{{item.roleName.replace('注册','')}}</a></p>
+			<button :style='{"padding":"0 10px","boxShadow":"0 0 6px  rgba(112, 243, 255, 0.71)","margin":"16px auto","borderColor":"rgba(21, 20, 20, 0.41)","backgroundColor":"rgba(112, 243, 255, 0.71)","color":"rgba(231, 47, 47, 1)","borderRadius":"8px","borderWidth":"1px","width":"60%","fontSize":"14px","borderStyle":"solid","height":"44px"}' class="layui-btn layui-btn-fluid layui-btn-danger btn-submit" lay-submit lay-filter="login">登录</button>
+            <p :style='{"color":"#0588e6","textAlign":"right","fontSize":"14px","marginTop":"8px"}' class="txt">
+                <span style="color:#909399;margin-right:8px;">没有账号？</span>
+                <a style="color:#0588e6;font-size: inherit; text-decoration: none;" v-if="item.hasFrontRegister=='是'" v-for="(item,index) in menu" v-bind:key="'reg'+index" :href="'javascript:registerClick(\''+item.tableName+'\')'">注册{{item.roleName.replace('注册','')}}</a>
+            </p>
         </form>
     </div>
 
@@ -109,14 +113,18 @@
         var vue = new Vue({
             el: '#app',
             data: {
-                menu: menu
+                menu: typeof menu !== 'undefined' ? menu : []
             },
             methods: {
-                jump(url) {
-                    jump(url)
-                }
+                jump: function(url) { if (typeof jump === 'function') jump(url); }
+            },
+            mounted: function() {
+                var that = this;
+                this.$nextTick(function() {
+                    if (layui.form) layui.form.render('radio');
+                });
             }
-        })
+        });
 
         layui.use(['layer', 'element', 'carousel', 'form', 'http', 'jquery'], function() {
             var layer = layui.layer;
@@ -157,9 +165,10 @@
                     })
                     
                 });
-                return false
+                return false;
             });
-
+            // 确保身份单选项被 layui 渲染
+            vue.$nextTick(function() { form.render('radio'); });
         });
 
         /**
