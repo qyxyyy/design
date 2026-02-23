@@ -31,8 +31,9 @@
           </el-form-item>
           <el-button type="primary" @click="login()" class="loginInBt" style="padding:0;font-size:16px;border-radius:50px;height:44px;line-height:44px;width:100%;backgroundColor:rgba(104, 223, 240, 1); borderColor:rgba(104, 223, 240, 1); color:rgba(255, 255, 255, 1)">{{'1' == '1' ? '登录' : 'login'}}</el-button>
           <el-form-item class="setting">
-                                                            <div style="color:rgba(255, 255, 255, 1)" class="register" @click="register('zuke')">注册租客</div>
-                                                                                                                                                                                                                                    <!-- <div style="color:rgba(255, 255, 255, 1)" class="reset">修改密码</div> -->
+            <div style="color:rgba(255, 255, 255, 1)" class="register" @click="register('zuke')">注册租客</div>
+            <div style="color:rgba(255, 255, 255, 1)" class="register" @click="register('huzhu')">注册房东</div>
+            <!-- <div style="color:rgba(255, 255, 255, 1)" class="reset">修改密码</div> -->
           </el-form-item>
         </el-form>
       </div>

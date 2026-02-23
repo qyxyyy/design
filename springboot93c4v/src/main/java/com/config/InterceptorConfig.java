@@ -1,5 +1,6 @@
 package com.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -9,17 +10,34 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupp
 import com.interceptor.AuthorizationInterceptor;
 
 @Configuration
-public class InterceptorConfig extends WebMvcConfigurationSupport{
-	
+public class InterceptorConfig extends WebMvcConfigurationSupport {
+
+	@Value("${server.servlet.context-path:}")
+	private String contextPath;
+
 	@Bean
-    public AuthorizationInterceptor getAuthorizationInterceptor() {
-        return new AuthorizationInterceptor();
-    }
-	
+	public AuthorizationInterceptor getAuthorizationInterceptor() {
+		return new AuthorizationInterceptor();
+	}
+
 	@Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(getAuthorizationInterceptor()).addPathPatterns("/**").excludePathPatterns("/static/**");
-        super.addInterceptors(registry);
+	public void addInterceptors(InterceptorRegistry registry) {
+		String prefix = (contextPath == null || contextPath.isEmpty()) ? "" : contextPath;
+		registry.addInterceptor(getAuthorizationInterceptor())
+				.addPathPatterns("/**")
+				.excludePathPatterns(
+						"/",
+						"/login",
+						"/static/**",
+						"/front/**",
+						"**/front/**",
+						prefix + "/front/**",       // 明确排除带 context-path 的前台路径
+						prefix + "/static/**",
+						"/zuke/register", "/huzhu/register",
+						"**/zuke/register", "**/huzhu/register",
+						prefix + "/zuke/register", prefix + "/huzhu/register"
+				);
+		super.addInterceptors(registry);
 	}
 	
 	/**

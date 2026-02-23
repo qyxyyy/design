@@ -25,9 +25,11 @@ import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.annotation.IgnoreAuth;
 
 import com.entity.HuzhuEntity;
+import com.entity.UserEntity;
 import com.entity.view.HuzhuView;
 
 import com.service.HuzhuService;
+import com.service.UserService;
 import com.service.TokenService;
 import com.utils.PageUtils;
 import com.utils.R;
@@ -48,8 +50,88 @@ import com.utils.CommonUtil;
 public class HuzhuController {
     @Autowired
     private HuzhuService huzhuService;
-    
 
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private TokenService tokenService;
+
+    /**
+     * 登录（统一 user 表，identity_type=2 为房东）
+     */
+    @IgnoreAuth
+    @RequestMapping(value = "/login")
+    public R login(String username, String password, String captcha, HttpServletRequest request) {
+        if (username == null || username.trim().isEmpty()) return R.error("请输入账号");
+        if (password == null) password = "";
+        UserEntity user = userService.selectOne(new EntityWrapper<UserEntity>()
+                .eq("username", username.trim()).eq("identity_type", 2));
+        if (user == null) return R.error("账号或密码不正确");
+        String pwdDb = user.getPassword();
+        if (pwdDb == null || !pwdDb.equals(MD5Util.md5(password))) {
+            return R.error("账号或密码不正确");
+        }
+        String token = tokenService.generateToken(user.getId(), username, "huzhu", "户主");
+        return R.ok().put("token", token);
+    }
+
+    /**
+     * 注册（写入 user 表，identity_type=2）
+     */
+    @IgnoreAuth
+    @RequestMapping("/register")
+    public R register(@RequestBody HuzhuEntity huzhu) {
+        UserEntity exist = userService.selectOne(new EntityWrapper<UserEntity>().eq("username", huzhu.getZhanghao()));
+        if (exist != null) {
+            return R.error("注册用户已存在");
+        }
+        UserEntity user = new UserEntity();
+        user.setUsername(huzhu.getZhanghao());
+        user.setPassword(huzhu.getMima() != null ? MD5Util.md5(huzhu.getMima()) : "");
+        user.setRealName(huzhu.getHuzhuxingming());
+        user.setPhone(huzhu.getLianxifangshi());
+        user.setEmail(huzhu.getYouxiang());
+        user.setAddress(huzhu.getDizhi());
+        user.setIdentityType(2);
+        user.setStatus(1);
+        userService.insert(user);
+        return R.ok();
+    }
+
+    /**
+     * 退出
+     */
+    @RequestMapping("/logout")
+    public R logout(HttpServletRequest request) {
+        request.getSession().invalidate();
+        return R.ok("退出成功");
+    }
+
+    /**
+     * 获取当前登录用户信息（统一 user 表）
+     */
+    @RequestMapping("/session")
+    public R getCurrUser(HttpServletRequest request) {
+        Long id = (Long) request.getSession().getAttribute("userId");
+        UserEntity user = userService.selectById(id);
+        return R.ok().put("data", user);
+    }
+
+    /**
+     * 密码重置
+     */
+    @IgnoreAuth
+    @RequestMapping(value = "/resetPass")
+    public R resetPass(String username, HttpServletRequest request) {
+        UserEntity user = userService.selectOne(new EntityWrapper<UserEntity>().eq("username", username).eq("identity_type", 2));
+        if (user == null) {
+            return R.error("账号不存在");
+        }
+        user.setPassword(MD5Util.md5("123456"));
+        userService.updateById(user);
+        return R.ok("密码已重置为：123456");
+    }
 
     /**
      * 后端列表

@@ -5,6 +5,8 @@
 
 	<!-- 可根据自己的需求，是否要使用 -->
     <resultMap type="com.entity.HuzhuEntity" id="huzhuMap">
+        <result property="zhanghao" column="zhanghao"/>
+        <result property="mima" column="mima"/>
         <result property="huzhuxingming" column="huzhuxingming"/>
         <result property="xingbie" column="xingbie"/>
         <result property="lianxifangshi" column="lianxifangshi"/>

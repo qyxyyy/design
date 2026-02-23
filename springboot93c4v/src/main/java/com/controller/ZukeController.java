@@ -25,9 +25,11 @@ import com.baomidou.mybatisplus.mapper.Wrapper;
 import com.annotation.IgnoreAuth;
 
 import com.entity.ZukeEntity;
+import com.entity.UserEntity;
 import com.entity.view.ZukeView;
 
 import com.service.ZukeService;
+import com.service.UserService;
 import com.service.TokenService;
 import com.utils.PageUtils;
 import com.utils.R;
@@ -48,41 +50,60 @@ import com.utils.CommonUtil;
 public class ZukeController {
     @Autowired
     private ZukeService zukeService;
-    
+
+	@Autowired
+	private UserService userService;
+	
 	@Autowired
 	private TokenService tokenService;
 	
 	/**
-	 * 登录
+	 * 登录（统一 user 表，identity_type=1 为租客）
 	 */
 	@IgnoreAuth
 	@RequestMapping(value = "/login")
 	public R login(String username, String password, String captcha, HttpServletRequest request) {
-		ZukeEntity user = zukeService.selectOne(new EntityWrapper<ZukeEntity>().eq("zhanghao", username));
-		if(user==null || !user.getMima().equals(password)) {
+		if (username == null || username.trim().isEmpty()) {
+			return R.error("请输入账号");
+		}
+		if (password == null) {
+			password = "";
+		}
+		UserEntity user = userService.selectOne(new EntityWrapper<UserEntity>()
+				.eq("username", username.trim()).eq("identity_type", 1));
+		if (user == null) {
 			return R.error("账号或密码不正确");
 		}
-		
-		String token = tokenService.generateToken(user.getId(), username,"zuke",  "租客" );
+		String pwdDb = user.getPassword();
+		if (pwdDb == null || !pwdDb.equals(MD5Util.md5(password))) {
+			return R.error("账号或密码不正确");
+		}
+		String token = tokenService.generateToken(user.getId(), username, "zuke", "租客");
 		return R.ok().put("token", token);
 	}
 	
 	/**
-     * 注册
-     */
+	 * 注册（写入 user 表，identity_type=1）
+	 */
 	@IgnoreAuth
-    @RequestMapping("/register")
-    public R register(@RequestBody ZukeEntity zuke){
-    	//ValidatorUtils.validateEntity(zuke);
-    	ZukeEntity user = zukeService.selectOne(new EntityWrapper<ZukeEntity>().eq("zhanghao", zuke.getZhanghao()));
-		if(user!=null) {
+	@RequestMapping("/register")
+	public R register(@RequestBody ZukeEntity zuke) {
+		UserEntity exist = userService.selectOne(new EntityWrapper<UserEntity>().eq("username", zuke.getZhanghao()));
+		if (exist != null) {
 			return R.error("注册用户已存在");
 		}
-		Long uId = new Date().getTime();
-		zuke.setId(uId);
-        zukeService.insert(zuke);
-        return R.ok();
-    }
+		UserEntity user = new UserEntity();
+		user.setUsername(zuke.getZhanghao());
+		user.setPassword(zuke.getMima() != null ? MD5Util.md5(zuke.getMima()) : "");
+		user.setRealName(zuke.getXingming());
+		user.setPhone(zuke.getShouji());
+		user.setEmail(zuke.getYouxiang());
+		user.setAddress(zuke.getDizhi());
+		user.setIdentityType(1);
+		user.setStatus(1);
+		userService.insert(user);
+		return R.ok();
+	}
 	
 	/**
 	 * 退出
@@ -93,30 +114,30 @@ public class ZukeController {
 		return R.ok("退出成功");
 	}
 	
-	/**
-     * 获取用户的session用户信息
+    /**
+     * 获取当前登录用户信息（统一 user 表）
      */
     @RequestMapping("/session")
-    public R getCurrUser(HttpServletRequest request){
-    	Long id = (Long)request.getSession().getAttribute("userId");
-        ZukeEntity user = zukeService.selectById(id);
-        return R.ok().put("data", user);
-    }
+    public R getCurrUser(HttpServletRequest request) {
+		Long id = (Long) request.getSession().getAttribute("userId");
+		UserEntity user = userService.selectById(id);
+		return R.ok().put("data", user);
+	}
     
     /**
      * 密码重置
      */
     @IgnoreAuth
 	@RequestMapping(value = "/resetPass")
-    public R resetPass(String username, HttpServletRequest request){
-    	ZukeEntity user = zukeService.selectOne(new EntityWrapper<ZukeEntity>().eq("zhanghao", username));
-    	if(user==null) {
-    		return R.error("账号不存在");
-    	}
-        user.setMima("123456");
-        zukeService.updateById(user);
-        return R.ok("密码已重置为：123456");
-    }
+	public R resetPass(String username, HttpServletRequest request) {
+		UserEntity user = userService.selectOne(new EntityWrapper<UserEntity>().eq("username", username).eq("identity_type", 1));
+		if (user == null) {
+			return R.error("账号不存在");
+		}
+		user.setPassword(MD5Util.md5("123456"));
+		userService.updateById(user);
+		return R.ok("密码已重置为：123456");
+	}
 
 
     /**

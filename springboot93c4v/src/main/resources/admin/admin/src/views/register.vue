@@ -76,7 +76,36 @@
 			<el-form-item label="地址" class="input" v-if="tableName=='zuke'">
 			  <el-input v-model="ruleForm.dizhi" autocomplete="off" placeholder="地址" type="text" />
 			</el-form-item>
-																																																															<el-button class="btn" type="primary" @click="login()">注册</el-button>
+			<!-- 户主(房东)注册表单 -->
+			<el-form-item label="账号" class="input" v-if="tableName=='huzhu'">
+			  <el-input v-model="ruleForm.zhanghao" autocomplete="off" placeholder="账号" type="text" />
+			</el-form-item>
+			<el-form-item label="密码" class="input" v-if="tableName=='huzhu'">
+			  <el-input v-model="ruleForm.mima" autocomplete="off" placeholder="密码" type="password" />
+			</el-form-item>
+			<el-form-item label="户主姓名" class="input" v-if="tableName=='huzhu'">
+			  <el-input v-model="ruleForm.huzhuxingming" autocomplete="off" placeholder="户主姓名" type="text" />
+			</el-form-item>
+			<el-form-item label="性别" class="input" v-if="tableName=='huzhu'">
+			  <el-input v-model="ruleForm.xingbie" autocomplete="off" placeholder="性别" type="text" />
+			</el-form-item>
+			<el-form-item label="联系方式" class="input" v-if="tableName=='huzhu'">
+			  <el-input v-model="ruleForm.lianxifangshi" autocomplete="off" placeholder="联系方式" type="text" />
+			</el-form-item>
+			<el-form-item label="邮箱" class="input" v-if="tableName=='huzhu'">
+			  <el-input v-model="ruleForm.youxiang" autocomplete="off" placeholder="邮箱" type="text" />
+			</el-form-item>
+			<el-form-item label="身份证" class="input" v-if="tableName=='huzhu'">
+			  <el-input v-model="ruleForm.shenfenzheng" autocomplete="off" placeholder="身份证" type="text" />
+			</el-form-item>
+			<el-form-item label="地址" class="input" v-if="tableName=='huzhu'">
+			  <el-input v-model="ruleForm.dizhi" autocomplete="off" placeholder="地址" type="text" />
+			</el-form-item>
+			<el-form-item v-if="!tableName" class="input">
+			  <span style="color:#606266">请从登录页点击「注册租客」或「注册房东」进入注册。</span>
+			  <el-button type="text" @click="$router.replace('/login')">返回登录</el-button>
+			</el-form-item>
+			<el-button class="btn" type="primary" @click="login()" v-if="tableName">注册</el-button>
 		</el-form>
       </div>
       <!-- <div class="nk-navigation">
@@ -108,31 +137,38 @@ export default {
     },
     // 注册
     login() {
-                                          if((!this.ruleForm.zhanghao) && `zuke` == this.tableName){
-        this.$message.error(`账号不能为空`);
-        return
+      if (!this.tableName) return;
+      // 租客校验
+      if (this.tableName === 'zuke') {
+        if (!this.ruleForm.zhanghao) { this.$message.error('账号不能为空'); return; }
+        if (!this.ruleForm.mima) { this.$message.error('密码不能为空'); return; }
+        if (!this.ruleForm.xingming) { this.$message.error('姓名不能为空'); return; }
+        if (this.ruleForm.shouji && !this.$validate.isMobile(this.ruleForm.shouji)) {
+          this.$message.error('手机应输入手机格式'); return;
+        }
+        if (this.ruleForm.youxiang && !this.$validate.isEmail(this.ruleForm.youxiang)) {
+          this.$message.error('邮箱应输入邮件格式'); return;
+        }
+        if (this.ruleForm.shenfenzheng && !this.$validate.checkIdCard(this.ruleForm.shenfenzheng)) {
+          this.$message.error('身份证应输入身份证格式'); return;
+        }
       }
-                                                                  if((!this.ruleForm.mima) && `zuke` == this.tableName){
-        this.$message.error(`密码不能为空`);
-        return
+      // 户主(房东)校验
+      if (this.tableName === 'huzhu') {
+        if (!this.ruleForm.zhanghao) { this.$message.error('账号不能为空'); return; }
+        if (!this.ruleForm.mima) { this.$message.error('密码不能为空'); return; }
+        if (!this.ruleForm.huzhuxingming) { this.$message.error('户主姓名不能为空'); return; }
+        if (this.ruleForm.lianxifangshi && !this.$validate.isMobile(this.ruleForm.lianxifangshi)) {
+          this.$message.error('联系方式应输入手机格式'); return;
+        }
+        if (this.ruleForm.youxiang && !this.$validate.isEmail(this.ruleForm.youxiang)) {
+          this.$message.error('邮箱应输入邮件格式'); return;
+        }
+        if (this.ruleForm.shenfenzheng && !this.$validate.checkIdCard(this.ruleForm.shenfenzheng)) {
+          this.$message.error('身份证应输入身份证格式'); return;
+        }
       }
-                                                                  if((!this.ruleForm.xingming) && `zuke` == this.tableName){
-        this.$message.error(`姓名不能为空`);
-        return
-      }
-                                                                                                                                                                                                      if(`zuke` == this.tableName && this.ruleForm.shouji&&(!this.$validate.isMobile(this.ruleForm.shouji))){
-        this.$message.error(`手机应输入手机格式`);
-        return
-      }
-                                                                        if(`zuke` == this.tableName && this.ruleForm.youxiang&&(!this.$validate.isEmail(this.ruleForm.youxiang))){
-        this.$message.error(`邮箱应输入邮件格式`);
-        return
-      }
-                                                                        if(`zuke` == this.tableName && this.ruleForm.shenfenzheng&&(!this.$validate.checkIdCard(this.ruleForm.shenfenzheng))){
-        this.$message.error(`身份证应输入身份证格式`);
-        return
-      }
-                                                                                                                                                                                                                                                this.$http({
+      this.$http({
         url: `${this.tableName}/register`,
         method: "post",
         data:this.ruleForm

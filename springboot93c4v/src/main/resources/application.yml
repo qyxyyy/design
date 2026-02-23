@@ -4,7 +4,7 @@ server:
         uri-encoding: UTF-8
     port: 8080
     servlet:
-        context-path: /springboot93c4v
+        context-path: /
 
 spring:
     datasource:
@@ -12,12 +12,12 @@ spring:
         url: jdbc:mysql://127.0.0.1:3306/fangwu?useUnicode=true&characterEncoding=utf-8&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=GMT%2B8
         username: root
         password: 123456
-
-#        driverClassName: com.microsoft.sqlserver.jdbc.SQLServerDriver
-#        url: jdbc:sqlserver://127.0.0.1:1433;DatabaseName=springboot93c4v
-#        username: sa
-#        password: 123456
-
+    thymeleaf:
+      prefix: classpath:/templates/
+      suffix: .html
+      mode: HTML
+      encoding: UTF-8
+      cache: false
     servlet:
       multipart:
         max-file-size: 10MB

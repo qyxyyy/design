@@ -52,9 +52,16 @@ public class HuzhuEntity<T> implements Serializable {
 	@TableId
 	private Long id;
 	/**
+	 * 账号
+	 */
+	private String zhanghao;
+	/**
+	 * 密码
+	 */
+	private String mima;
+	/**
 	 * 户主姓名
 	 */
-					
 	private String huzhuxingming;
 	
 	/**
@@ -111,6 +118,30 @@ public class HuzhuEntity<T> implements Serializable {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+	/**
+	 * 设置：账号
+	 */
+	public void setZhanghao(String zhanghao) {
+		this.zhanghao = zhanghao;
+	}
+	/**
+	 * 获取：账号
+	 */
+	public String getZhanghao() {
+		return zhanghao;
+	}
+	/**
+	 * 设置：密码
+	 */
+	public void setMima(String mima) {
+		this.mima = mima;
+	}
+	/**
+	 * 获取：密码
+	 */
+	public String getMima() {
+		return mima;
 	}
 	/**
 	 * 设置：户主姓名

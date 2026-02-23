@@ -27,6 +27,7 @@ import com.entity.UserEntity;
 import com.service.TokenService;
 import com.service.UserService;
 import com.utils.CommonUtil;
+import com.utils.MD5Util;
 import com.utils.MPUtil;
 import com.utils.PageUtils;
 import com.utils.R;
@@ -51,11 +52,16 @@ public class UserController{
 	@IgnoreAuth
 	@PostMapping(value = "/login")
 	public R login(String username, String password, String captcha, HttpServletRequest request) {
-		UserEntity user = userService.selectOne(new EntityWrapper<UserEntity>().eq("username", username));
-		if(user==null || !user.getPassword().equals(password)) {
+		if (username == null || username.trim().isEmpty()) return R.error("请输入账号");
+		if (password == null) password = "";
+		UserEntity user = userService.selectOne(new EntityWrapper<UserEntity>()
+				.eq("username", username.trim()).eq("identity_type", 3));
+		if (user == null) return R.error("账号或密码不正确");
+		String pwdDb = user.getPassword();
+		if (pwdDb == null || !pwdDb.equals(MD5Util.md5(password))) {
 			return R.error("账号或密码不正确");
 		}
-		String token = tokenService.generateToken(user.getId(),username, "users", user.getRole());
+		String token = tokenService.generateToken(user.getId(), username, "users", user.getRole());
 		return R.ok().put("token", token);
 	}
 	
@@ -64,14 +70,16 @@ public class UserController{
 	 */
 	@IgnoreAuth
 	@PostMapping(value = "/register")
-	public R register(@RequestBody UserEntity user){
-//    	ValidatorUtils.validateEntity(user);
-    	if(userService.selectOne(new EntityWrapper<UserEntity>().eq("username", user.getUsername())) !=null) {
-    		return R.error("用户已存在");
-    	}
-        userService.insert(user);
-        return R.ok();
-    }
+	public R register(@RequestBody UserEntity user) {
+		if (userService.selectOne(new EntityWrapper<UserEntity>().eq("username", user.getUsername())) != null) {
+			return R.error("用户已存在");
+		}
+		if (user.getIdentityType() == null) user.setIdentityType(3);
+		if (user.getPassword() != null) user.setPassword(MD5Util.md5(user.getPassword()));
+		user.setStatus(user.getStatus() != null ? user.getStatus() : 1);
+		userService.insert(user);
+		return R.ok();
+	}
 
 	/**
 	 * 退出
@@ -92,8 +100,8 @@ public class UserController{
     	if(user==null) {
     		return R.error("账号不存在");
     	}
-    	user.setPassword("123456");
-        userService.update(user,null);
+    	user.setPassword(MD5Util.md5("123456"));
+        userService.updateById(user);
         return R.ok("密码已重置为：123456");
     }
 	
@@ -140,14 +148,15 @@ public class UserController{
      * 保存
      */
     @PostMapping("/save")
-    public R save(@RequestBody UserEntity user){
-//    	ValidatorUtils.validateEntity(user);
-    	if(userService.selectOne(new EntityWrapper<UserEntity>().eq("username", user.getUsername())) !=null) {
-    		return R.error("用户已存在");
-    	}
-        userService.insert(user);
-        return R.ok();
-    }
+    public R save(@RequestBody UserEntity user) {
+		if (userService.selectOne(new EntityWrapper<UserEntity>().eq("username", user.getUsername())) != null) {
+			return R.error("用户已存在");
+		}
+		if (user.getPassword() != null) user.setPassword(MD5Util.md5(user.getPassword()));
+		user.setStatus(user.getStatus() != null ? user.getStatus() : 1);
+		userService.insert(user);
+		return R.ok();
+	}
 
     /**
      * 修改
