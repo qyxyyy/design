@@ -65,10 +65,15 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
 		if ("GET".equalsIgnoreCase(request.getMethod()) && (pathToCheck.contains(".html") || pathToCheck.contains("pages") || pathToCheck.contains("front") || pathToCheck.contains("static"))) {
 			return true;
 		}
+		// 注册页、注册接口、登录接口一律放行（避免注册户主等出现 401）
 		if (pathToCheck.contains("front") || pathToCheck.contains("static")
 				|| pathToCheck.contains("register.html") || pathToCheck.contains("register")
 				|| pathToCheck.contains("zuke/register") || pathToCheck.contains("huzhu/register")
 				|| pathToCheck.contains("users/login") || pathToCheck.contains("zuke/login") || pathToCheck.contains("huzhu/login")) {
+			return true;
+		}
+		// 任意方法：注册、登录接口路径放行
+		if (pathToCheck.contains("huzhu/register") || pathToCheck.contains("zuke/register") || pathToCheck.contains("users/register")) {
 			return true;
 		}
         

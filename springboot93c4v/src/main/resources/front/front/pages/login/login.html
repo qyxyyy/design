@@ -144,26 +144,24 @@
                     });
                     return false;
                 }
-                http.request(data.role + '/login', 'get', data, function(res) {
-                    layer.msg('登录成功', {
-                        time: 2000,
-                        icon: 6
-                    });
-                    // 登录凭证
+                var loginUrl = (data.role === 'users' ? 'users/login' : data.role + '/login');
+                http.request(loginUrl, 'get', data, function(res) {
+                    layer.msg('登录成功', { time: 2000, icon: 6 });
                     localStorage.setItem('Token', res.token);
-                    localStorage.setItem('role', jquery('#role:checked').attr('title'));
-                    // 当前登录用户角色
+                    var roleName = jquery('#role:checked').attr('title') || (data.role === 'users' ? '管理员' : data.role === 'zuke' ? '租客' : '户主');
+                    localStorage.setItem('role', roleName);
                     localStorage.setItem('userTable', data.role);
                     localStorage.setItem('sessionTable', data.role);
-                    // 用户名称
                     localStorage.setItem('adminName', data.username);
+                    if (data.role === 'users') {
+                        localStorage.setItem('userid', '');
+                        window.location.href = typeof adminurl !== 'undefined' ? adminurl : 'http://localhost:8080/admin/dist/index.html';
+                        return;
+                    }
                     http.request(data.role + '/session', 'get', {}, function(res) {
-                        // 用户id
-                        localStorage.setItem('userid', res.data.id);
-                        // 路径访问设置
+                        localStorage.setItem('userid', (res.data && res.data.id) || '');
                         window.location.href = '../../index.html';
-                    })
-                    
+                    });
                 });
                 return false;
             });

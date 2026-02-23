@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -47,10 +48,10 @@ public class UserController{
 	private TokenService tokenService;
 
 	/**
-	 * 登录
+	 * 登录（支持 GET/POST，前端统一用 GET 调各角色登录）
 	 */
 	@IgnoreAuth
-	@PostMapping(value = "/login")
+	@RequestMapping(value = "/login", method = {RequestMethod.GET, RequestMethod.POST})
 	public R login(String username, String password, String captcha, HttpServletRequest request) {
 		if (username == null || username.trim().isEmpty()) return R.error("请输入账号");
 		if (password == null) password = "";
@@ -61,7 +62,7 @@ public class UserController{
 		if (pwdDb == null || !pwdDb.equals(MD5Util.md5(password))) {
 			return R.error("账号或密码不正确");
 		}
-		String token = tokenService.generateToken(user.getId(), username, "users", user.getRole());
+		String token = tokenService.generateToken(user.getId(), username, "users", user.getRole() != null ? user.getRole() : "管理员");
 		return R.ok().put("token", token);
 	}
 	
@@ -76,8 +77,30 @@ public class UserController{
 		}
 		if (user.getIdentityType() == null) user.setIdentityType(3);
 		if (user.getPassword() != null) user.setPassword(MD5Util.md5(user.getPassword()));
+		if (user.getAvatar() == null || user.getAvatar().trim().isEmpty()) {
+			user.setAvatar("http://codegen.caihongy.cn/20201024/ed5e326ca66f403aa3197b5fbb4ec733.jpg");
+		}
 		user.setStatus(user.getStatus() != null ? user.getStatus() : 1);
 		userService.insert(user);
+		return R.ok();
+	}
+
+	/**
+	 * 更新当前登录用户头像（仅更新 avatar 字段）
+	 */
+	@RequestMapping("/updateAvatar")
+	public R updateAvatar(@RequestBody Map<String, Object> body, HttpServletRequest request) {
+		Long id = (Long) request.getSession().getAttribute("userId");
+		if (id == null) {
+			return R.error(401, "请先登录");
+		}
+		String avatar = body == null ? null : (body.get("avatar") == null ? null : body.get("avatar").toString());
+		if (avatar == null || avatar.trim().isEmpty()) {
+			return R.error("头像不能为空");
+		}
+		UserEntity entity = new UserEntity();
+		entity.setAvatar(avatar);
+		userService.update(entity, new EntityWrapper<UserEntity>().eq("id", id));
 		return R.ok();
 	}
 

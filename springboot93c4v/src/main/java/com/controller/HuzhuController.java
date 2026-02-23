@@ -95,6 +95,8 @@ public class HuzhuController {
         user.setAddress(huzhu.getDizhi());
         user.setIdentityType(2);
         user.setStatus(1);
+        // 默认头像（注册时）
+        user.setAvatar("http://codegen.caihongy.cn/20201024/ed5e326ca66f403aa3197b5fbb4ec733.jpg");
         userService.insert(user);
         return R.ok();
     }

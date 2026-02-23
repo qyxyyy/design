@@ -155,7 +155,10 @@
 			<div v-if='true' class="nav-top">
 			  <img v-if='true' class="nav-top-img" src='http://codegen.caihongy.cn/20210122/43479e25bd0d45139de4e2e2eba0a312.jpg'>
 			  <div v-if="false" class="nav-top-title">{{projectName}}</div>
-			  <div class="nav-top-tel">欢迎来到我的网站</div>
+			  <div class="nav-top-user" style="display:flex;align-items:center;gap:12px;">
+				<img class="nav-top-avatar" :src="avatarImg" style="width:42px;height:42px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,.8);">
+				<div class="nav-top-tel">{{ welcomeText }}</div>
+			  </div>
 			</div>
 		    <div class="navs">
 		    	<!-- <div class="logo" style="font-size: 20px;top: 32px;color: #fff;font-weight: bold;margin-left: -200px;width: 240px;" v-text="projectName"></div> -->
@@ -187,6 +190,10 @@
 		<script src="./layui/layui.js"></script>
 		<script src="./js/vue.js"></script>
 		<script src="./js/config.js"></script>
+		<!-- 扩展插件配置信息 -->
+		<script src="./modules/config.js"></script>
+		<!-- 工具方法（含 http、upload 等） -->
+		<script src="./modules/http/http.js"></script>
 
 		<script>
       var vue1 = new Vue({el: '#tabbar'})
@@ -200,9 +207,13 @@
 					adminurl: adminurl,
 					chatFlag: chatFlag,
 					projectName: projectName,
+					defaultAvatar: 'http://codegen.caihongy.cn/20201024/ed5e326ca66f403aa3197b5fbb4ec733.jpg',
+					avatarImg: 'http://codegen.caihongy.cn/20201024/ed5e326ca66f403aa3197b5fbb4ec733.jpg',
+					welcomeText: '欢迎来到我的网站',
 				},
 				mounted: function() {
 					this.bindClickOnLi();
+					this.loadWelcome();
 				},
 				created() {
 					this.iconArr.sort(()=>{
@@ -220,6 +231,32 @@
 								$(this).addClass("current").siblings().removeClass("current");
 							}
 						}
+					},
+					loadWelcome() {
+						var that = this;
+						var token = localStorage.getItem('Token');
+						var userTable = localStorage.getItem('userTable'); // users / zuke / huzhu
+						var roleName = localStorage.getItem('role') || '';
+						if (!token || !userTable) {
+							that.avatarImg = that.defaultAvatar;
+							that.welcomeText = '欢迎来到我的网站';
+							return;
+						}
+						layui.use(['http'], function() {
+							var http = layui.http;
+							http.request(userTable + '/session', 'get', {}, function(res) {
+								var user = (res && res.data) ? res.data : {};
+								var displayName = (user.realName && ('' + user.realName).trim()) ? user.realName : user.username;
+								if (!displayName) displayName = localStorage.getItem('adminName') || '';
+								var avatarVal = user.avatar || '';
+								var avatar = that.defaultAvatar;
+								if (avatarVal) {
+									avatar = (avatarVal.indexOf('http') === 0) ? avatarVal : (http.baseurl + 'upload/' + avatarVal);
+								}
+								that.avatarImg = avatar;
+								that.welcomeText = '欢迎 ' + (displayName || '用户') + (roleName ? (' ' + roleName) : '') + ' 来到网站';
+							});
+						});
 					}
 				}
 			});

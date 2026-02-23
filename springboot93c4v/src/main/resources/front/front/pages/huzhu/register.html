@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>户主注册</title>
+    <link rel="stylesheet" type="text/css" href="../../layui/css/layui.css">
+    <link rel="stylesheet" type="text/css" href="../../xznstatic/css/public.css"/>
+    <link rel="stylesheet" type="text/css" href="../../xznstatic/css/login.css"/>
+    <style>
+        .register-wrap { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: url(http://codegen.caihongy.cn/20210128/5aa2b5f3e1b842f1a639e734555f3a7c.jpg) center/cover fixed; }
+        .register-form { padding: 24px; background: #fff; border-radius: 8px; box-shadow: 0 2px 12px rgba(0,0,0,.15); width: 420px; max-width: 96%; }
+        .register-form h1 { text-align: center; margin-bottom: 20px; color: #333; font-size: 22px; }
+        .form-item { margin-bottom: 16px; }
+        .form-item label { display: block; margin-bottom: 6px; color: #606266; }
+        .form-item input { width: 100%; padding: 10px 12px; border: 1px solid #dcdfe6; border-radius: 4px; box-sizing: border-box; }
+        .btn-reg { width: 100%; padding: 12px; background: rgba(104, 223, 240, 1); color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        .btn-reg:hover { opacity: 0.9; }
+        .back-login { text-align: center; margin-top: 16px; }
+        .back-login a { color: rgba(104, 223, 240, 1); }
+    </style>
+</head>
+<body>
+    <div id="app" class="register-wrap">
+        <div class="register-form">
+            <h1>户主注册</h1>
+            <form class="layui-form" id="regForm">
+                <div class="form-item">
+                    <label>账号 <span style="color:red">*</span></label>
+                    <input type="text" name="zhanghao" required placeholder="请输入账号" autocomplete="off">
+                </div>
+                <div class="form-item">
+                    <label>密码 <span style="color:red">*</span></label>
+                    <input type="password" name="mima" required placeholder="请输入密码" autocomplete="off">
+                </div>
+                <div class="form-item">
+                    <label>户主姓名 <span style="color:red">*</span></label>
+                    <input type="text" name="huzhuxingming" required placeholder="请输入户主姓名" autocomplete="off">
+                </div>
+                <div class="form-item">
+                    <label>性别</label>
+                    <input type="text" name="xingbie" placeholder="请输入性别" autocomplete="off">
+                </div>
+                <div class="form-item">
+                    <label>联系方式</label>
+                    <input type="text" name="lianxifangshi" placeholder="请输入手机号" autocomplete="off">
+                </div>
+                <div class="form-item">
+                    <label>邮箱</label>
+                    <input type="text" name="youxiang" placeholder="请输入邮箱" autocomplete="off">
+                </div>
+                <div class="form-item">
+                    <label>身份证</label>
+                    <input type="text" name="shenfenzheng" placeholder="请输入身份证号" autocomplete="off">
+                </div>
+                <div class="form-item">
+                    <label>地址</label>
+                    <input type="text" name="dizhi" placeholder="请输入地址" autocomplete="off">
+                </div>
+                <div class="form-item">
+                    <button type="button" class="btn-reg" id="btnRegister">注册</button>
+                </div>
+            </form>
+            <div class="back-login"><a href="../login/login.html">返回登录</a></div>
+        </div>
+    </div>
+    <script src="../../layui/layui.js"></script>
+    <script src="../../js/vue.js"></script>
+    <script src="../../js/config.js"></script>
+    <script src="../../modules/config.js"></script>
+    <script src="../../modules/http/http.js"></script>
+    <script>
+        layui.use(['layer', 'form', 'jquery', 'http'], function() {
+            var layer = layui.layer;
+            var form = layui.form;
+            var jquery = layui.jquery;
+            var http = layui.http;
+            jquery('#btnRegister').on('click', function() {
+                var zhanghao = jquery('input[name="zhanghao"]').val();
+                var mima = jquery('input[name="mima"]').val();
+                var huzhuxingming = jquery('input[name="huzhuxingming"]').val();
+                if (!zhanghao) { layer.msg('请输入账号', { icon: 5 }); return; }
+                if (!mima) { layer.msg('请输入密码', { icon: 5 }); return; }
+                if (!huzhuxingming) { layer.msg('请输入户主姓名', { icon: 5 }); return; }
+                var data = {
+                    zhanghao: zhanghao,
+                    mima: mima,
+                    huzhuxingming: huzhuxingming,
+                    xingbie: jquery('input[name="xingbie"]').val() || '',
+                    lianxifangshi: jquery('input[name="lianxifangshi"]').val() || '',
+                    youxiang: jquery('input[name="youxiang"]').val() || '',
+                    shenfenzheng: jquery('input[name="shenfenzheng"]').val() || '',
+                    dizhi: jquery('input[name="dizhi"]').val() || ''
+                };
+                http.requestJson('huzhu/register', 'post', data, function(res) {
+                    layer.msg('注册成功', { icon: 6, time: 1500 }, function() {
+                        window.location.href = '../login/login.html';
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>

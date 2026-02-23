@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>出租信息</title>
+  <link rel="stylesheet" href="../../layui/css/layui.css">
+  <style>
+    body { background:#fff; }
+    .wrap { padding: 16px; }
+    .hint { color:#666; margin: 10px 0 16px; }
+    .grid { display:grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    .item { border:1px solid #eee; border-radius: 10px; padding: 14px; cursor:pointer; transition:.15s; }
+    .item:hover { box-shadow: 0 6px 18px rgba(0,0,0,.08); transform: translateY(-1px); }
+    .name { font-weight: 700; margin-bottom: 6px; }
+    .desc { font-size: 12px; color:#888; line-height: 1.4; }
+    @media (max-width: 900px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 520px) { .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="layui-card">
+      <div class="layui-card-header">出租信息</div>
+      <div class="layui-card-body">
+        <div class="hint">这里先把“出租信息”作为房源发布/管理入口，后续可以按户主维度做“我的房源/上下架/出租状态”等。</div>
+        <div class="grid">
+          <div class="item" onclick="go('../fangwuxinxi/add.html')">
+            <div class="name">发布房源</div>
+            <div class="desc">新增房屋信息（图片、面积、租金等）</div>
+          </div>
+          <div class="item" onclick="go('../fangwuxinxi/list.html')">
+            <div class="name">房源列表</div>
+            <div class="desc">查看现有房屋信息（后续可新增“仅看我的房源”筛选）</div>
+          </div>
+          <div class="item" onclick="go('../baoxiuxinxi/list.html')">
+            <div class="name">报修处理</div>
+            <div class="desc">查看报修信息（后续可接“处理/完成”状态）</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function go(url){ window.location.href = url; }
+  </script>
+</body>
+</html>
+

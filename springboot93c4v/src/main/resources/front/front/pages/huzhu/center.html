@@ -2,22 +2,22 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>个人中心</title>
+<title>户主中心</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="../../layui/css/layui.css">
 <link rel="stylesheet" href="../../xznstatic/css/common.css"/>
 <link rel="stylesheet" href="../../xznstatic/css/style.css"/>
 <style>
 .center-page { max-width: 1100px; margin: 0 auto; padding: 20px; }
-.center-tabs { display: flex; border-bottom: 2px solid #0588e6; margin-bottom: 20px; }
-.center-tabs .tab { padding: 12px 24px; font-size: 16px; color: #333; cursor: pointer; }
+.center-tabs { display: flex; flex-wrap: wrap; gap: 6px; border-bottom: 2px solid #0588e6; margin-bottom: 20px; }
+.center-tabs .tab { padding: 10px 18px; font-size: 15px; color: #333; cursor: pointer; border-radius: 6px 6px 0 0; }
 .center-tabs .tab:hover { color: #0588e6; }
 .center-tabs .tab.active { color: #0588e6; font-weight: bold; border-bottom: 2px solid #0588e6; margin-bottom: -2px; }
 .center-content { min-height: 400px; }
 .center-content .panel { display: none; }
 .center-content .panel.active { display: block; }
-.center-content .panel iframe { width: 100%; min-height: 500px; border: none; }
-.user-card { background: #fff; border-radius: 8px; padding: 24px; box-shadow: 0 1px 8px rgba(0,0,0,.08); max-width: 400px; }
+.center-content .panel iframe { width: 100%; min-height: 560px; border: none; }
+.user-card { background: #fff; border-radius: 8px; padding: 24px; box-shadow: 0 1px 8px rgba(0,0,0,.08); max-width: 520px; }
 .user-card .avatar { display:flex; align-items:center; gap:12px; margin-bottom: 16px; }
 .user-card .avatar img { width:64px; height:64px; border-radius:50%; object-fit:cover; border:2px solid #e6e6e6; }
 .user-card .row { margin-bottom: 12px; font-size: 15px; }
@@ -28,6 +28,9 @@
 <div id="app" class="center-page">
   <div class="center-tabs">
     <div class="tab active" data-tab="user">个人中心</div>
+    <div class="tab" data-tab="chuzu">出租信息</div>
+    <div class="tab" data-tab="zhengming">证明资料</div>
+    <div class="tab" data-tab="biaoqian">房屋优点标签</div>
     <div class="tab" data-tab="fangwu">房屋信息</div>
     <div class="tab" data-tab="luntan">论坛</div>
   </div>
@@ -48,6 +51,15 @@
         <div class="row"><span class="label">邮箱：</span>{{user.email}}</div>
         <div class="row"><span class="label">地址：</span>{{user.address}}</div>
       </div>
+    </div>
+    <div class="panel" id="panel-chuzu">
+      <iframe src="./chuzu.html" id="iframe-chuzu"></iframe>
+    </div>
+    <div class="panel" id="panel-zhengming">
+      <iframe src="./zhengming.html" id="iframe-zhengming"></iframe>
+    </div>
+    <div class="panel" id="panel-biaoqian">
+      <iframe src="./biaoqian.html" id="iframe-biaoqian"></iframe>
     </div>
     <div class="panel" id="panel-fangwu">
       <iframe src="../fangwuxinxi/list.html" id="iframe-fangwu"></iframe>
@@ -72,7 +84,7 @@ var vue = new Vue({
   },
   mounted: function() {
     var userTable = localStorage.getItem('userTable');
-    if (!userTable || userTable !== 'zuke') {
+    if (!userTable || userTable !== 'huzhu') {
       if (window.parent) window.parent.location.href = '../../index.html';
       else window.location.href = '../login/login.html';
       return;
@@ -88,6 +100,7 @@ var vue = new Vue({
         });
       }
       refreshSession();
+
       jquery('.center-tabs .tab').on('click', function() {
         var tab = jquery(this).data('tab');
         jquery('.center-tabs .tab').removeClass('active');
@@ -109,8 +122,7 @@ var vue = new Vue({
         });
       });
     });
-  }
-  ,
+  },
   methods: {
     chooseAvatar: function() {
       var el = document.getElementById('avatarFile');
@@ -121,3 +133,4 @@ var vue = new Vue({
 </script>
 </body>
 </html>
+
