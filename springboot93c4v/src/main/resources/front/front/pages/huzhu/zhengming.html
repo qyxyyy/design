@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>证明资料</title>
+  <link rel="stylesheet" href="../../layui/css/layui.css">
+  <style>
+    body { background:#fff; }
+    .wrap { padding: 16px; }
+    .tip { color:#666; margin: 8px 0 12px; }
+    .list { margin-top: 12px; }
+    .row { display:flex; align-items:center; justify-content:space-between; padding: 10px 12px; border:1px solid #eee; border-radius: 8px; margin-bottom: 8px; }
+    .row .name { font-weight: 600; }
+    .row .a { color:#0588e6; cursor:pointer; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="layui-card">
+      <div class="layui-card-header">证明资料（示例版）</div>
+      <div class="layui-card-body">
+        <div class="tip">先提供“可上传并看到文件列表”的基础体验；后续可把文件与户主/房源关联，进入审核流程。</div>
+        <button type="button" class="layui-btn layui-btn-sm" id="btnUpload">上传证明资料</button>
+        <input type="file" id="fileInput" style="display:none" />
+
+        <div class="list" id="fileList"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../layui/layui.js"></script>
+  <script src="../../modules/config.js"></script>
+  <script src="../../modules/http/http.js"></script>
+  <script>
+    layui.use(['http', 'jquery', 'layer'], function () {
+      var http = layui.http;
+      var $ = layui.jquery;
+      var layer = layui.layer;
+
+      function loadList() {
+        var arr = [];
+        try { arr = JSON.parse(localStorage.getItem('huzhu_proof_files') || '[]'); } catch(e) {}
+        var html = '';
+        if (!arr.length) {
+          html = '<div style="color:#999;padding:12px 0;">暂无资料，请先上传</div>';
+        } else {
+          arr.forEach(function (it, idx) {
+            var url = (it.indexOf('http') === 0) ? it : (http.baseurl + 'upload/' + it);
+            html += '<div class="row">'
+              + '<div class="name">资料 ' + (idx + 1) + '</div>'
+              + '<div>'
+              + '<a class="a" href="' + url + '" target="_blank">查看</a>'
+              + '<span style="margin:0 8px;color:#ddd;">|</span>'
+              + '<a class="a" href="javascript:void(0)" data-del="' + idx + '">删除</a>'
+              + '</div>'
+              + '</div>';
+          });
+        }
+        $('#fileList').html(html);
+      }
+
+      $('#btnUpload').on('click', function () {
+        $('#fileInput').val('').click();
+      });
+
+      $('#fileInput').on('change', function (e) {
+        var file = e.target.files && e.target.files[0];
+        if (!file) return;
+        http.upload(file, '', function (up) {
+          var fileName = up.file;
+          var arr = [];
+          try { arr = JSON.parse(localStorage.getItem('huzhu_proof_files') || '[]'); } catch(e) {}
+          arr.unshift(fileName);
+          localStorage.setItem('huzhu_proof_files', JSON.stringify(arr));
+          layer.msg('上传成功', { time: 1200, icon: 6 });
+          loadList();
+        });
+      });
+
+      $('#fileList').on('click', '[data-del]', function () {
+        var idx = parseInt($(this).attr('data-del'), 10);
+        var arr = [];
+        try { arr = JSON.parse(localStorage.getItem('huzhu_proof_files') || '[]'); } catch(e) {}
+        arr.splice(idx, 1);
+        localStorage.setItem('huzhu_proof_files', JSON.stringify(arr));
+        loadList();
+      });
+
+      loadList();
+    });
+  </script>
+</body>
+</html>
+

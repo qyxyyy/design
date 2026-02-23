@@ -84,7 +84,11 @@ var vue = new Vue({
         http.request(userTable + '/session', 'get', {}, function(res) {
           that.user = res.data || {};
           var avatarVal = that.user.avatar || '';
-          that.avatarImg = avatarVal ? (avatarVal.indexOf('http') === 0 ? avatarVal : (http.baseurl + 'upload/' + avatarVal)) : that.defaultAvatar;
+          if (avatarVal) {
+            that.avatarImg = avatarVal.indexOf('http') === 0 ? avatarVal : (http.baseurl + 'file/download?fileName=' + encodeURIComponent(avatarVal));
+          } else {
+            that.avatarImg = that.defaultAvatar;
+          }
         });
       }
       refreshSession();

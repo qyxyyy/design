@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>租客首页</title>
+  <link rel="stylesheet" href="../../layui/css/layui.css">
+  <link rel="stylesheet" href="../../xznstatic/css/common.css"/>
+  <link rel="stylesheet" href="../../xznstatic/css/style.css"/>
+  <style>
+    body { background: #f6f7fb; }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 20px; }
+    .title { font-size: 20px; font-weight: 700; margin-bottom: 14px; }
+    .grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+    .card { background:#fff; border-radius: 12px; padding: 18px; box-shadow: 0 4px 14px rgba(0,0,0,.06); cursor:pointer; transition: .15s; }
+    .card:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(0,0,0,.10); }
+    .card .name { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .card .desc { font-size: 12px; color:#6b7280; line-height: 1.4; }
+    @media (max-width: 980px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 520px) { .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="title">租客工作台</div>
+    <div class="grid">
+      <div class="card" onclick="go('../fangwuxinxi/list.html')">
+        <div class="name">找房/房屋信息</div>
+        <div class="desc">浏览房源列表，查看详情</div>
+      </div>
+      <div class="card" onclick="go('../luntan/list.html')">
+        <div class="name">论坛</div>
+        <div class="desc">交流讨论、查看帖子</div>
+      </div>
+      <div class="card" onclick="go('../baoxiuxinxi/list.html')">
+        <div class="name">报修</div>
+        <div class="desc">提交与查看报修信息（示例模块）</div>
+      </div>
+      <div class="card" onclick="go('./center.html')">
+        <div class="name">个人中心</div>
+        <div class="desc">修改头像与个人信息</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    function go(url) { window.location.href = url; }
+  </script>
+</body>
+</html>
+

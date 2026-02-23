@@ -160,6 +160,14 @@
                     }
                     http.request(data.role + '/session', 'get', {}, function(res) {
                         localStorage.setItem('userid', (res.data && res.data.id) || '');
+                        // 不同身份登录后默认进入不同首页（iframe 默认地址）
+                        if (data.role === 'huzhu') {
+                            localStorage.setItem('iframeUrl', './pages/huzhu/home.html');
+                        } else if (data.role === 'zuke') {
+                            localStorage.setItem('iframeUrl', './pages/zuke/home.html');
+                        } else {
+                            localStorage.setItem('iframeUrl', './pages/home/home.html');
+                        }
                         window.location.href = '../../index.html';
                     });
                 });

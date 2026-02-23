@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>房屋优点标签</title>
+  <link rel="stylesheet" href="../../layui/css/layui.css">
+  <style>
+    body { background:#fff; }
+    .wrap { padding: 16px; }
+    .tip { color:#666; margin: 8px 0 12px; }
+    .tags { display:flex; flex-wrap:wrap; gap: 10px; }
+    .tag { padding: 8px 12px; border:1px solid #ddd; border-radius: 999px; cursor:pointer; user-select:none; }
+    .tag.active { background:#0588e6; color:#fff; border-color:#0588e6; }
+    .bar { margin-top: 14px; display:flex; align-items:center; gap:10px; }
+    .out { margin-top: 14px; color:#333; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="layui-card">
+      <div class="layui-card-header">房屋优点标签（示例版）</div>
+      <div class="layui-card-body">
+        <div class="tip">先提供“选择标签并保存”的基础体验；后续可与房源绑定、用于筛选/展示。</div>
+        <div class="tags" id="tags"></div>
+        <div class="bar">
+          <button type="button" class="layui-btn layui-btn-sm" id="btnSave">保存标签</button>
+          <button type="button" class="layui-btn layui-btn-sm layui-btn-primary" id="btnReset">清空</button>
+        </div>
+        <div class="out" id="out"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../layui/layui.js"></script>
+  <script>
+    layui.use(['jquery', 'layer'], function () {
+      var $ = layui.jquery;
+      var layer = layui.layer;
+      var all = ['交通便利', '近地铁', '精装修', '可做饭', '可养宠物', '拎包入住', '采光好', '带阳台', '配套齐全', '物业好', '安静', '电梯房'];
+
+      function loadSelected() {
+        var arr = [];
+        try { arr = JSON.parse(localStorage.getItem('huzhu_adv_tags') || '[]'); } catch(e) {}
+        return arr;
+      }
+      function render() {
+        var selected = loadSelected();
+        $('#tags').html(all.map(function (t) {
+          var active = selected.indexOf(t) !== -1 ? 'active' : '';
+          return '<span class="tag ' + active + '" data-tag="' + t + '">' + t + '</span>';
+        }).join(''));
+        $('#out').html(selected.length ? ('已选择：' + selected.join('、')) : '<span style="color:#999;">未选择标签</span>');
+      }
+
+      $('#tags').on('click', '.tag', function () {
+        $(this).toggleClass('active');
+      });
+
+      $('#btnSave').on('click', function () {
+        var selected = [];
+        $('#tags .tag.active').each(function () { selected.push($(this).attr('data-tag')); });
+        localStorage.setItem('huzhu_adv_tags', JSON.stringify(selected));
+        layer.msg('已保存', { time: 1200, icon: 6 });
+        render();
+      });
+
+      $('#btnReset').on('click', function () {
+        localStorage.setItem('huzhu_adv_tags', JSON.stringify([]));
+        render();
+      });
+
+      render();
+    });
+  </script>
+</body>
+</html>
+
