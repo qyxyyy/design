@@ -13,110 +13,137 @@
 		html, body {
 			height: 100%;
 		}
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #FAFAFA;
+      font-family: "PingFang SC","Microsoft YaHei",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      color: #2D3748;
+    }
 		#iframe {
 			width: 100%;
-			margin-top: 140px;
-			padding-top: 50px;
+			margin-top: 132px;
+			padding-top: 0;
 		}
 		#header {
 			height: auto;
-			background: #fff;
+			background: #FAFAFA;
 			border-bottom: 0;
 			position: fixed;
 			top: 0;
 			left: 0;
 			width: 100%;
+			z-index: 1000;
 		}
 
 		#header .nav-top {
 			display: flex;
 			align-items: center;
-			padding: 0 20px;
-			font-size: 16px;
-			color: #2a8a15;
-			box-sizing: border-box;
-			height: 140px;
-			background-color: rgba(255, 255, 255, 1);
-			box-shadow: 0px 0px 0px  #a1afc9;
 			justify-content: space-between;
+			padding: 12px 32px;
+			box-sizing: border-box;
+			height: 76px;
+			background-color: #FAFAFA;
+			box-shadow: 0 1px 0 rgba(226, 232, 240, 0.8);
 			position: relative;
 		}
 
+		#header .nav-top-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
 		#header .nav-top-img {
-			width: 160px;
-			height: 100px;
-			padding: 0px;
-			margin: 250px;
-			border-radius: 0px;
+			width: 40px;
+			height: 40px;
+			padding: 0;
+			margin: 0;
+			border-radius: 8px;
 			border-width: 0;
 			border-style: solid;
-			border-color: rgba(0,0,0,.3);
-			box-shadow: 0 0 0px rgba(0,0,0,.3);
+			border-color: transparent;
+			box-shadow: none;
+			object-fit: cover;
 		}
 
 		#header .nav-top-title {
-			line-height: 50px;
-			font-size: 28px;
-			color: rgba(250, 255, 114, 1);
-			padding: 0 10px;
-			margin: 0 10px;
-			border-radius: 6px;
-			border-width: 0;
-			border-style: solid;
-			border-color: rgba(112, 243, 255, 0.71);
-			box-shadow: 0 0 0px ;
+			line-height: 1.2;
+			font-size: 20px;
+			color: #2A4365;
+			padding: 0;
+			margin: 0;
+			font-weight: 700;
 		}
+    #header .nav-top-subtitle {
+      font-size: 12px;
+      color: #718096;
+      margin-top: 2px;
+    }
 
+		#header .nav-top-user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    #header .nav-top-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #E2E8F0;
+    }
 		#header .nav-top-tel {
-			line-height: 40px;
-			font-size: 22px;
-			color: rgba(233, 121, 19, 1);
-			padding: 0 10px;
-			margin: 80px;
-			border-radius: 0px;
+			line-height: 1.4;
+			font-size: 13px;
+			color: #2D3748;
+			padding: 0;
+			margin: 0;
+			border-radius: 0;
 			border-width: 0;
 			border-style: solid;
-			border-color: rgba(0,0,0,.3);
-			box-shadow:  0px rgba(0,0,0,.3);
+			border-color: transparent;
+			box-shadow: none;
 		}
 
 		#header .navs {
 			display: flex;
-			padding: 0 20px;
+			padding: 0 32px;
 			align-items: center;
 			box-sizing: border-box;
-			height: 50px;
-			background-color: rgba(0, 88, 169, 1);
-			box-shadow: 0 1px 6px rgba(0,0,0,0);
-			justify-content: flex-start;
+			height: 56px;
+			background-color: #2A4365;
+			box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+			justify-content: space-between;
 		}
 		#header .navs .title {
 			width: auto;
-			line-height: 45px;
-			font-size: 26px;
-			color: rgba(255, 255, 255, 1);
-			padding: 0 35px;
-			margin:  8px;
-			border-radius: 6px;
-			border-width: 0;
-			border-style: solid;
-			border-color: rgba(0,0,0,.3);
-			box-shadow: 0 0 6px rgba(0,0,0,0);
+			line-height: 1;
+			font-size: 18px;
+			color: #ffffff;
+			padding: 0;
+			margin: 0;
+			font-weight: 700;
+			letter-spacing: 1px;
+		}
+		#header .navs .list ul {
+			display: flex;
+			align-items: center;
+			gap: 24px;
 		}
 		#header .navs li {
 			display: inline-block;
 			width: auto;
-			line-height: 52px;
-			padding: 0 30px;
-			margin: 0 1px;
-			color: rgba(255, 255, 255, 1);
-			font-size: 20px;
-			border-radius: 0px;
+			line-height: 56px;
+			padding: 0;
+			margin: 0;
+			color: rgba(255, 255, 255, 0.85);
+			font-size: 15px;
+			border-radius: 0;
 			border-width: 0;
 			border-style: solid;
-			border-color: rgba(0,0,0,.3);
-			background-color: rgba(0, 88, 169, 1);
-			box-shadow: 0px  0px  0px ;
+			border-color: transparent;
+			background-color: transparent;
+			box-shadow: none;
       text-align: center;
 		}
 		#header .navs li a{
@@ -129,51 +156,52 @@
 			color: inherit;
 		}
 		#header .navs li.current {
-			color: rgba(255, 255, 255, 1);
-			font-size: 22px;
-			border-radius: 0px;
-			border-width: 0;
-			border-style: solid;
-			border-color: rgba(0,0,0,.3);
-			background-color: rgba(233, 121, 19, 1);
-			box-shadow: 0px  0px 0px ;
+			color: #ffffff;
+			font-size: 15px;
+			position: relative;
+		}
+		#header .navs li.current::after {
+			content: '';
+			position: absolute;
+			left: 0;
+			right: 0;
+			bottom: 8px;
+			height: 2px;
+			background-color: #ED8936;
+			border-radius: 999px;
 		}
 		#header .navs li:hover {
-			color: rgba(255, 255, 255, 1);
-			font-size: 22px;
-			border-radius: 0px;
-			border-width: 0;
-			border-style: solid;
-			border-color: rgba(0,0,0,.3);
-			background-color: rgba(233, 121, 19, 1);
-			box-shadow: 0 0 0px ;
+			color: #FBD38D;
 		}
 	</style>
 	<body>
 		<!-- start 顶部导航栏 -->
 		<div id="header">
 			<div v-if='true' class="nav-top">
-			  <img v-if='true' class="nav-top-img" src='http://codegen.caihongy.cn/20210122/43479e25bd0d45139de4e2e2eba0a312.jpg'>
-			  <div v-if="false" class="nav-top-title">{{projectName}}</div>
-			  <div class="nav-top-user" style="display:flex;align-items:center;gap:12px;">
-				<img class="nav-top-avatar" :src="avatarImg" style="width:42px;height:42px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,.8);">
+        <div class="nav-top-left">
+          <img v-if='true' class="nav-top-img" src='./xznstatic/images/logo-home.png'>
+          <div>
+            <div class="nav-top-title">房屋租赁管理系统</div>
+            <div class="nav-top-subtitle">资产可视化 · 智能化招租 · 租客&户主一体化管理</div>
+          </div>
+        </div>
+			  <div class="nav-top-user">
+				<img class="nav-top-avatar" :src="avatarImg">
 				<div class="nav-top-tel">
 					{{ welcomeText }}
-					<a href="javascript:void(0)" @click="logout" style="margin-left:12px;color:#0588e6;font-size:12px;">退出</a>
+					<a href="javascript:void(0)" @click="logout" style="margin-left:12px;color:#2A4365;font-size:12px;padding:4px 8px;border-radius:4px;transition:background-color .15s ease;color:#2A4365;">退出</a>
 				</div>
 			  </div>
 			</div>
 		    <div class="navs">
 		    	<!-- <div class="logo" style="font-size: 20px;top: 32px;color: #fff;font-weight: bold;margin-left: -200px;width: 240px;" v-text="projectName"></div> -->
-				<div class="title" v-if="true" v-text="projectName"></div>
+				<div class="title" v-if="true">房屋租赁系统</div>
 				<div class="list">
 					<ul>
-						<li class='current'><a href="javascript:navPage('./pages/home/home.html')" class="menumain"><i v-if="false" class="layui-icon layui-icon-home"></i>首页</a></li>
-						<li v-for="(item,index) in indexNav" v-bind:key="index"><a :href="'javascript:navPage(\''+item.url+'\')'" class="menumain" style="cursor: pointer;"><i v-if="false" class="layui-icon" :class="iconArr[index]"></i>{{item.name}}</a></li>
-						<li><a href="javascript:centerPage();" class="menumain"><i v-if="false" class="layui-icon layui-icon-username"></i>个人中心</a></li>
-						<li><a :href="adminurl" target="_blank" class="menumain" style="cursor: pointer;"><i v-if="false" class="layui-icon layui-icon-link"></i>后台管理</a></li>
-						<li v-if="cartFlag"><a href="javascript:navPage('./pages/shop-cart/list.html')" class="menumain"><i v-if="false" class="layui-icon">&#xe657;</i>购物车</a></li>
-						<li v-if="chatFlag"><a href="javascript:chatTap()" class="menumain"><i v-if="false" class="layui-icon">&#xe677;</i>客服</a></li>
+						<li class='current'><a href="javascript:navPage('./pages/home/home.html')" class="menumain">首页</a></li>
+						<li><a href="javascript:navPage('./pages/fangwuxinxi/list.html')" class="menumain">房屋信息</a></li>
+						<li><a href="javascript:navPage('./pages/huzhu/home.html')" class="menumain">户主工作台</a></li>
+						<li><a href="javascript:centerPage();" class="menumain">个人中心</a></li>
 					</ul>
 				</div>
 		    </div>
@@ -182,11 +210,10 @@
 
 		<iframe src="./pages/home/home.html" id="iframe" frameborder="0" scrolling="no" width="100%" onload="changeFrameHeight"></iframe>
 
-    <div id="tabbar" v-if="true" class="tabbar" :style='{"padding":"20px 0","boxShadow":"0 0 0px","margin":"0px 0 0 0","borderColor":"rgba(112, 243, 255, 0.71)","backgroundColor":"rgba(0, 88, 169, 1)","borderRadius":"0","borderWidth":"0","borderStyle":"solid"}' style="position: relative;z-index: 999;">
-      <img v-if='false' :style='{"boxShadow":"0 0 6px rgba(255,0,0,.8)","margin":"0 auto","borderColor":"rgba(0,0,0,.3)","borderRadius":"100%","borderWidth":"1px","width":"44px","borderStyle":"solid","height":"44px"}' style='display: block;' src='http://codegen.caihongy.cn/20201024/ed5e326ca66f403aa3197b5fbb4ec733.jpg' />
-      <div :style='{"padding":"0 10px","boxShadow":"0 0 6px rgba(255,0,0,.8)","margin":"0px ","borderColor":"rgba(0,0,0,1)","backgroundColor":"#000","color":"#fff","textAlign":"center","borderRadius":"0","borderWidth":"0","width":"100%","lineHeight":"32px","fontSize":"14px","borderStyle":"solid"}' class="company"></div>
-      <div :style='{"padding":"0 10px","boxShadow":"0 0 6px rgba(255,0,0,0)","margin":"10px auto","borderColor":"rgba(112, 243, 255, 0.05)","backgroundColor":"rgba(112, 243, 255, 0)","color":"rgba(250, 255, 114, 1)","textAlign":"center","borderRadius":"0","borderWidth":"0","width":"100%","lineHeight":"32px","fontSize":"14px","borderStyle":"solid"}' class="record"></div>
-      <div :style='{"padding":"0 10px","boxShadow":"0 0 0px","margin":"0px auto 10px auto","borderColor":"rgba(112, 243, 255, 0)","backgroundColor":"rgba(112, 243, 255, 0)","color":"rgba(233, 121, 19, 1)","textAlign":"center","borderRadius":"0","borderWidth":"","width":"30%","lineHeight":"32px","fontSize":"14px","borderStyle":"solid"}' class="desc">咨询热线：4008000000 | 联系邮箱：support@21epub.com</div>
+    <div id="tabbar" v-if="true" class="tabbar" :style='{"padding":"16px 0","boxShadow":"0 0 0px","margin":"0px 0 0 0","borderColor":"transparent","backgroundColor":"#2A4365","borderRadius":"0","borderWidth":"0","borderStyle":"solid"}' style="position: relative;z-index: 999;">
+      <div :style='{"padding":"0 10px","boxShadow":"0 0 0px","margin":"0","borderColor":"transparent","backgroundColor":"transparent","color":"#FFFFFF","textAlign":"center","borderRadius":"0","borderWidth":"0","width":"100%","lineHeight":"32px","fontSize":"14px","borderStyle":"solid"}' class="desc">
+        咨询热线：4008000000 | 联系邮箱：support@21epub.com
+      </div>
     </div>
 
 		<script src="./xznstatic/js/jquery-1.11.3.min.js"></script>
@@ -221,7 +248,17 @@
 				created() {
 					this.iconArr.sort(()=>{
 					  return (0.5-Math.random())
-					})
+					});
+					// 根据当前登录身份，调整顶部导航模块
+					var userTable = localStorage.getItem('userTable');
+					if (userTable === 'huzhu') {
+						// 户主：去掉“论坛”，增加“户主工作台”
+						this.indexNav = [
+							{ name: '公告信息', url: './pages/gonggaoxinxi/list.html' },
+							{ name: '房屋信息', url: './pages/fangwuxinxi/list.html' },
+							{ name: '户主工作台', url: './pages/huzhu/home.html' }
+						];
+					}
 				},
 				methods: {
 					jump(url) {
