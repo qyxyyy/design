@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>发帖</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../../layui/css/layui.css">
+<link rel="stylesheet" href="../../xznstatic/css/common.css"/>
+<style>
+.add-wrap { max-width: 600px; margin: 20px auto; padding: 20px; background: #fff; border-radius: 8px; box-shadow: 0 1px 8px rgba(0,0,0,.08); }
+.add-wrap .form-item { margin-bottom: 16px; }
+.add-wrap .form-item label { display: block; margin-bottom: 6px; color: #333; }
+.add-wrap .form-item input, .add-wrap .form-item textarea { width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+.add-wrap .form-item textarea { min-height: 120px; resize: vertical; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="add-wrap">
+    <form class="layui-form">
+      <div class="form-item">
+        <label>标题 <span style="color:red">*</span></label>
+        <input type="text" name="title" id="title" required placeholder="请输入标题">
+      </div>
+      <div class="form-item">
+        <label>内容 <span style="color:red">*</span></label>
+        <textarea name="content" id="content" placeholder="请输入内容"></textarea>
+      </div>
+      <div class="form-item">
+        <button type="button" class="layui-btn" id="btn-submit">发布</button>
+        <a href="javascript:history.back()" class="layui-btn layui-btn-primary">取消</a>
+      </div>
+    </form>
+  </div>
+</div>
+<script src="../../layui/layui.js"></script>
+<script src="../../js/vue.js"></script>
+<script src="../../js/config.js"></script>
+<script src="../../modules/config.js"></script>
+<script>
+layui.use(['layer', 'http', 'jquery'], function() {
+  var layer = layui.layer, http = layui.http, jquery = layui.jquery;
+  jquery('#btn-submit').on('click', function() {
+    var title = jquery('#title').val();
+    var content = jquery('#content').val();
+    if (!title || !title.trim()) { layer.msg('请输入标题', { icon: 5 }); return; }
+    if (!content || !content.trim()) { layer.msg('请输入内容', { icon: 5 }); return; }
+    http.requestJson('luntan/add', 'post', { title: title.trim(), content: content.trim() }, function(res) {
+      layer.msg('发布成功', { icon: 6 }, function() {
+        if (window.parent && window.parent.navPage) window.parent.navPage('./pages/luntan/list.html');
+        else window.location.href = './list.html';
+      });
+    });
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>论坛</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<link rel="stylesheet" href="../../layui/css/layui.css">
+<link rel="stylesheet" href="../../xznstatic/css/common.css"/>
+<link rel="stylesheet" href="../../xznstatic/css/style.css"/>
+<style>
+.recommend { padding: 10px 0; }
+.recommend .box { max-width: 900px; margin: 0 auto; }
+.recommend .box .title { padding: 10px 0; font-size: 18px; color: #333; border-bottom: 1px solid #eee; margin-bottom: 15px; }
+.recommend .box .list-item { padding: 12px 15px; margin-bottom: 10px; background: #fff; border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,.08); cursor: pointer; }
+.recommend .box .list-item:hover { background: #f8f9fa; }
+.recommend .box .list-item .tit { font-size: 16px; color: #333; margin-bottom: 6px; }
+.recommend .box .list-item .meta { font-size: 12px; color: #999; }
+.recommend .box .filter { display: flex; align-items: center; margin-bottom: 15px; gap: 10px; }
+.recommend .box .filter input { padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px; width: 160px; }
+.btn-add { margin-left: auto; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="recommend">
+    <div class="box">
+      <div class="title">论坛</div>
+      <form class="layui-form filter">
+        <input type="text" name="title" id="title" placeholder="搜索标题" class="layui-input">
+        <button type="button" class="layui-btn layui-btn-normal" id="btn-search">搜索</button>
+        <button type="button" class="layui-btn layui-btn-normal btn-add" id="btn-add">发帖</button>
+      </form>
+      <div class="list">
+        <div @click="jump('../luntan/detail.html?id='+item.id)" v-for="(item,index) in dataList" :key="index" class="list-item">
+          <div class="tit">{{item.title}}</div>
+          <div class="meta">{{item.username}} · {{item.addtime}}</div>
+        </div>
+      </div>
+      <div class="pager" id="pager"></div>
+    </div>
+  </div>
+</div>
+<script src="../../layui/layui.js"></script>
+<script src="../../js/vue.js"></script>
+<script src="../../js/config.js"></script>
+<script src="../../modules/config.js"></script>
+<script src="../../js/utils.js"></script>
+<script>
+var vue = new Vue({
+  el: '#app',
+  data: { dataList: [] },
+  methods: { jump: function(url) { jump(url); } }
+});
+layui.use(['layer', 'laypage', 'http', 'jquery'], function() {
+  var layer = layui.layer, laypage = layui.laypage, http = layui.http, jquery = layui.jquery;
+  var limit = 10;
+  function pageList() {
+    var param = { page: 1, limit: limit };
+    if (jquery('#title').val()) param['title'] = jquery('#title').val();
+    http.request('luntan/list', 'get', param, function(res) {
+      vue.dataList = res.data.list || [];
+      laypage.render({
+        elem: 'pager',
+        count: res.data.total || 0,
+        limit: limit,
+        layout: ['prev', 'page', 'next'],
+        jump: function(obj, first) {
+          param.page = obj.curr;
+          if (!first) {
+            http.request('luntan/list', 'get', param, function(r) { vue.dataList = r.data.list || []; });
+          }
+        }
+      });
+    });
+  }
+  pageList();
+  jquery('#btn-search').on('click', function() { pageList(); });
+  jquery('#btn-add').on('click', function() {
+    if (!localStorage.getItem('Token')) {
+      layer.msg('请先登录', { icon: 5 });
+      return;
+    }
+    window.parent ? window.parent.navPage('./pages/luntan/add.html') : (window.location.href = './add.html');
+  });
+});
+</script>
+</body>
+</html>
