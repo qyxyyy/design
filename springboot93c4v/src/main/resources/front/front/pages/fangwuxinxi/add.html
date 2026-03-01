@@ -127,13 +127,26 @@
                                                                                 <div  :style='{"padding":"10px","boxShadow":"0 0 6px","margin":"0 0 10px 0","borderColor":"rgba(255, 0, 0, 0.3)","backgroundColor":"#fff","borderRadius":"4px","borderWidth":"0 0 1px 0","borderStyle":"solid"}' class="layui-form-item" pane>
 						<label  :style='{"width":"110px","padding":"0 12px 0 0","fontSize":"14px","color":"#333","textAlign":"left"}' class="layui-form-label">房源类型：</label>
 						<div class="layui-input-block">
-							<input :style='{"padding":"0 12px","boxShadow":"0 0 6px ","borderColor":"#DCDFE6","backgroundColor":"#fff","color":"#333","borderRadius":"4px","textAlign":"left","borderWidth":"1px","fontSize":"14px","borderStyle":"solid","height":"40px"}' v-model="detail.fangyuanleixing" type="text" :readonly="ro.fangyuanleixing" name="fangyuanleixing" id="fangyuanleixing" autocomplete="off" class="layui-input">
+              <select name="fangyuanleixing" id="fangyuanleixing" lay-filter="fangyuanleixing">
+                <option value="">请选择房源类型</option>
+                <option v-for="(item,index) in fangyuanOptions" :key="index" :value="item">{{item}}</option>
+              </select>
 						</div>
 					</div>
-                                                                                <div  :style='{"padding":"10px","boxShadow":"0 0 6px","margin":"0 0 10px 0","borderColor":"rgba(255, 0, 0, 0.3)","backgroundColor":"#fff","borderRadius":"4px","borderWidth":"0 0 1px 0","borderStyle":"solid"}' class="layui-form-item" pane>
+                                                                                <div id="row-huxing"  :style='{"padding":"10px","boxShadow":"0 0 6px","margin":"0 0 10px 0","borderColor":"rgba(255, 0, 0, 0.3)","backgroundColor":"#fff","borderRadius":"4px","borderWidth":"0 0 1px 0","borderStyle":"solid"}' class="layui-form-item" pane v-show="!isNonResidential">
 						<label  :style='{"width":"110px","padding":"0 12px 0 0","fontSize":"14px","color":"#333","textAlign":"left"}' class="layui-form-label">房屋户型：</label>
 						<div class="layui-input-block">
-							<input :style='{"padding":"0 12px","boxShadow":"0 0 6px ","borderColor":"#DCDFE6","backgroundColor":"#fff","color":"#333","borderRadius":"4px","textAlign":"left","borderWidth":"1px","fontSize":"14px","borderStyle":"solid","height":"40px"}' v-model="detail.fangwuhuxing" type="text" :readonly="ro.fangwuhuxing" name="fangwuhuxing" id="fangwuhuxing" autocomplete="off" class="layui-input">
+              <select name="fangwuhuxing" id="fangwuhuxing" lay-filter="fangwuhuxing" v-show="!isHezu">
+                <option value="">请选择户型</option>
+                <option v-for="(item,index) in huxingOptions" :key="index" :value="item">{{item}}</option>
+              </select>
+              <div v-show="isHezu" style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;">
+                <select id="roomType" name="roomType" lay-filter="roomType" style="min-width:140px;">
+                  <option value="">出租房间类型</option>
+                  <option v-for="(item,index) in roomTypeOptions" :key="index" :value="item">{{item}}</option>
+                </select>
+                <input type="checkbox" id="duwei" name="duwei" lay-skin="primary" title="带独卫">
+              </div>
 						</div>
 					</div>
                                                                                 <div :style='{"padding":"10px","boxShadow":"0 0 6px","margin":"0 0 10px 0","borderColor":"rgba(255, 0, 0, 0.3)","backgroundColor":"#fff","borderRadius":"4px","borderWidth":"0 0 1px 0","borderStyle":"solid"}' class="layui-form-item" pane>
@@ -311,7 +324,24 @@
                                                                     },
                     																																																		zhuangtai: [],
 																																								huzhuxingming: [],
-																																																																																																									centerMenu: centerMenu
+                              fangyuanOptions: [
+                                '整租・普通住宅',
+                                '整租・公寓',
+                                '整租・别墅',
+                                '合租・主卧',
+                                '合租・次卧',
+                                '合租房源（床位）',
+                                '商住两用',
+                                '仓库 / 厂房',
+                                '门面 / 商铺'
+                              ],
+                              huxingOptions: [],
+                              roomTypeOptions: ['主卧','次卧','床位'],
+                              isHezu: false,
+                              isNonResidential: false,
+                              currentRoomType: '',
+                              hasPrivateBath: false,
+																																																									centerMenu: centerMenu
 				},
 				updated: function() {
 					layui.form.render('select', 'myForm');
@@ -437,6 +467,54 @@
 																																																																																																																		vue.detail.lianxifangshi=res.data.lianxifangshi
 																																																																																																																	})
 				});
+
+        // 房源类型联动
+        var TYPE_HUXING_MAP = {
+          '整租・普通住宅': ['1室1厅1卫','2室1厅1卫','2室2厅1卫','3室2厅2卫'],
+          '整租・公寓': ['1室0厅1卫','1室1厅1卫','Loft'],
+          '整租・别墅': ['3室2厅2卫','4室2厅3卫','5室3厅3卫'],
+          '商住两用': ['一居开放式','两居Loft'],
+          '仓库 / 厂房': [],
+          '门面 / 商铺': []
+        };
+        var HEZU_TYPES = ['合租・主卧','合租・次卧','合租房源（床位）'];
+        var NON_RES_TYPES = ['商住两用','仓库 / 厂房','门面 / 商铺'];
+
+        function syncHuxingByType(typeVal) {
+          vue.detail.fangyuanleixing = typeVal || '';
+          vue.isHezu = HEZU_TYPES.indexOf(typeVal) !== -1;
+          vue.isNonResidential = NON_RES_TYPES.indexOf(typeVal) !== -1;
+          // 住宅整租：提供户型下拉
+          var list = TYPE_HUXING_MAP[typeVal] || [];
+          vue.huxingOptions = list;
+          if (!vue.isHezu && !vue.isNonResidential && list.length) {
+            vue.detail.fangwuhuxing = list[0];
+          } else if (vue.isHezu) {
+            vue.detail.fangwuhuxing = '';
+          } else if (vue.isNonResidential) {
+            vue.detail.fangwuhuxing = '';
+          }
+          vue.$nextTick(function () {
+            form.render('select', 'myForm');
+          });
+        }
+
+        form.on('select(fangyuanleixing)', function(data) {
+          syncHuxingByType(data.value);
+        });
+
+        form.on('select(fangwuhuxing)', function(data) {
+          vue.detail.fangwuhuxing = data.value;
+        });
+
+        form.on('select(roomType)', function(data) {
+          vue.currentRoomType = data.value;
+        });
+
+        // 独卫勾选
+        form.on('checkbox(duwei)', function(obj){
+          vue.hasPrivateBath = obj.elem.checked;
+        });
                 																				laydate.render({
 					elem: '#fabushijian'
 				});
@@ -604,6 +682,17 @@
 					                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        					
                     // 比较大小
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 					
+          // 根据房源类型组装户型/合租描述
+          if (vue.isHezu) {
+            var parts = [];
+            if (vue.currentRoomType) parts.push(vue.currentRoomType);
+            parts.push(vue.hasPrivateBath ? '带独卫' : '公共卫浴');
+            data.fangwuhuxing = parts.join(' · ');
+          } else if (vue.isNonResidential) {
+            // 非居住类，户型留空，由面积等信息体现
+            data.fangwuhuxing = '';
+          }
+
 					// 提交数据
 					http.requestJson('fangwuxinxi' + '/add', 'post', data, function(res) {
 					 	layer.msg('提交成功', {

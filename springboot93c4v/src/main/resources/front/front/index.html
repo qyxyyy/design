@@ -176,10 +176,10 @@
 	</style>
 	<body>
 		<!-- start 顶部导航栏 -->
-		<div id="header">
+        <div id="header">
 			<div v-if='true' class="nav-top">
         <div class="nav-top-left">
-          <img v-if='true' class="nav-top-img" src='./xznstatic/images/logo-home.png'>
+          <img v-if='true' class="nav-top-img" src='./xznstatic/img/logo-home.png'>
           <div>
             <div class="nav-top-title">房屋租赁管理系统</div>
             <div class="nav-top-subtitle">资产可视化 · 智能化招租 · 租客&户主一体化管理</div>
@@ -199,7 +199,7 @@
 				<div class="list">
 					<ul>
 						<li class='current'><a href="javascript:navPage('./pages/home/home.html')" class="menumain">首页</a></li>
-						<li><a href="javascript:navPage('./pages/fangwuxinxi/list.html')" class="menumain">房屋信息</a></li>
+						<li><a href="javascript:navPage('./pages/gonggaoxinxi/list.html')" class="menumain">公告信息</a></li>
 						<li><a href="javascript:navPage('./pages/huzhu/home.html')" class="menumain">户主工作台</a></li>
 						<li><a href="javascript:centerPage();" class="menumain">个人中心</a></li>
 					</ul>
@@ -252,11 +252,12 @@
 					// 根据当前登录身份，调整顶部导航模块
 					var userTable = localStorage.getItem('userTable');
 					if (userTable === 'huzhu') {
-						// 户主：去掉“论坛”，增加“户主工作台”
+						// 户主：顶部入口与导航保持一致
 						this.indexNav = [
+							{ name: '首页', url: './pages/home/home.html' },
 							{ name: '公告信息', url: './pages/gonggaoxinxi/list.html' },
-							{ name: '房屋信息', url: './pages/fangwuxinxi/list.html' },
-							{ name: '户主工作台', url: './pages/huzhu/home.html' }
+							{ name: '户主工作台', url: './pages/huzhu/home.html' },
+							{ name: '个人中心', url: 'center' }
 						];
 					}
 				},

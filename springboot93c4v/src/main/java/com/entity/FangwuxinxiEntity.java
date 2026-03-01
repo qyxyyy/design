@@ -82,6 +82,15 @@ public class FangwuxinxiEntity<T> implements Serializable {
 	private String zhuangtai;
 	
 	/**
+	 * 审核状态：待提交证明/待审核/已通过/已驳回
+	 */
+	private String shenheZhuangtai;
+	/**
+	 * 审核备注
+	 */
+	private String shenheBeizhu;
+	
+	/**
 	 * 面积
 	 */
 					
@@ -235,6 +244,30 @@ public class FangwuxinxiEntity<T> implements Serializable {
 	 */
 	public String getZhuangtai() {
 		return zhuangtai;
+	}
+	/**
+	 * 设置：审核状态
+	 */
+	public void setShenheZhuangtai(String shenheZhuangtai) {
+		this.shenheZhuangtai = shenheZhuangtai;
+	}
+	/**
+	 * 获取：审核状态
+	 */
+	public String getShenheZhuangtai() {
+		return shenheZhuangtai;
+	}
+	/**
+	 * 设置：审核备注
+	 */
+	public void setShenheBeizhu(String shenheBeizhu) {
+		this.shenheBeizhu = shenheBeizhu;
+	}
+	/**
+	 * 获取：审核备注
+	 */
+	public String getShenheBeizhu() {
+		return shenheBeizhu;
 	}
 	/**
 	 * 设置：面积

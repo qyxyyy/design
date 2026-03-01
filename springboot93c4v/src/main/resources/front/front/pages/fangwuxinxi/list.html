@@ -282,7 +282,7 @@ width: 100%;
 	    <div class="list" style="position: relative;">
 	      <div @click="jump('../fangwuxinxi/detail.html?id='+item.id)" v-for="(item,index) in dataList" :key="index" class="list-item" :class="4=='3'?'list-item3':4=='5'?'list-item5':''">
 	        <div class="list-item-body animation-box" :style='{"padding":"13px 0px 10px 0px","boxShadow":"1px 0 3px","margin":"0 0 10px 0","borderColor":"rgba(255, 255, 255, 0.3)","backgroundColor":"#fff","borderRadius":"4px","borderWidth":"0","borderStyle":"solid"}'>
-																																				<img :style='{"boxShadow":"0px 0 0px#1685a9","borderColor":"rgba(0,0,0,.3)","borderRadius":"0px 0px 0px 0px","borderWidth":"0","width":"100%","borderStyle":"solid","height":"260px"}' :src="item.tupian?item.tupian.split(',')[0]:''">
+																																				<img :style='{"boxShadow":"0px 0 0px#1685a9","borderColor":"rgba(0,0,0,.3)","borderRadius":"0px 0px 0px 0px","borderWidth":"0","width":"100%","borderStyle":"solid","height":"260px"}' :src="item._tupianUrl">
 																																																																																																																				<div class="info">
 					<div v-if="item.price" :style='{"padding":"0","margin":"10px 0 0 0","backgroundColor":"rgba(0,0,0,0)","color":"rgba(201, 55, 86, 1)","borderRadius":"0","textAlign":"right","width":"100%","fontSize":"14px"}' class="price">{{item.price}} RMB</div>
 															<div v-if="true" :style='{"isshow":true,"padding":"0","margin":"5px 0 0 0","backgroundColor":"rgba(0,0,0,0)","color":"rgba(22, 133, 169, 1)","borderRadius":"0","textAlign":"center","width":"100%","fontSize":"16px"}' class="name">{{item.fangwubianhao}}</div>
@@ -309,7 +309,7 @@ width: 100%;
       data: {
         swiperList: [],
         dataList: [],
-		swiperIndex: '-1'
+        swiperIndex: '-1'
       },
       filters: {
         newsDesc: function(val) {
@@ -324,7 +324,7 @@ width: 100%;
         }
       },
       methods: {
-      	isAuth(tablename, button) {
+        isAuth(tablename, button) {
           return isFrontAuth(tablename, button)
         },
         jump(url) {
@@ -342,6 +342,23 @@ width: 100%;
       var jquery = layui.jquery;
 
 			var limit = 8;
+
+      function normalizeImage(list) {
+        if (!list) return [];
+        return (list || []).map(function (it) {
+          var url = '';
+          if (it.tupian) {
+            var first = ('' + it.tupian).split(',')[0];
+            if (first.indexOf('http') === 0) {
+              url = first;
+            } else {
+              url = http.baseurl + 'upload/' + first;
+            }
+          }
+          it._tupianUrl = url;
+          return it;
+        });
+      }
 
       // 获取轮播图 数据
       http.request('config/list', 'get', {
@@ -392,8 +409,11 @@ width: 100%;
           page: 1,
           limit: limit
         }
-
-
+        var isMyList = (function(){ var m = /myList=1/.exec(location.search); return m; })();
+        if (!isMyList && localStorage.getItem('userTable') !== 'huzhu') {
+          param.shenheZhuangtai = '已通过';
+        }
+        if (isMyList) param.myList = '1';
         if (jquery('#fangwubianhao').val()) {
           param['fangwubianhao'] = jquery('#fangwubianhao').val() ? '%' + jquery('#fangwubianhao').val() + '%' : '';
         }
@@ -408,7 +428,7 @@ width: 100%;
 
         // 获取列表数据
         http.request('fangwuxinxi/list', 'get', param, function(res) {
-          vue.dataList = res.data.list
+          vue.dataList = normalizeImage(res.data.list || []);
           // 分页
           laypage.render({
             elem: 'pager',
@@ -422,7 +442,7 @@ width: 100%;
               //首次不执行
               if (!first) {
                 http.request('fangwuxinxi/list', 'get', param, function(res) {
-                  vue.dataList = res.data.list
+                  vue.dataList = normalizeImage(res.data.list || []);
                 })
               }
             }

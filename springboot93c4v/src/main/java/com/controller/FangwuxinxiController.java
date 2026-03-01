@@ -15,6 +15,7 @@ import com.utils.ValidatorUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,9 +27,13 @@ import com.annotation.IgnoreAuth;
 
 import com.entity.FangwuxinxiEntity;
 import com.entity.view.FangwuxinxiView;
+import com.entity.FangwuzhengmingEntity;
+import com.entity.UserEntity;
 
 import com.service.FangwuxinxiService;
+import com.service.FangwuzhengmingService;
 import com.service.TokenService;
+import com.service.UserService;
 import com.utils.PageUtils;
 import com.utils.R;
 import com.utils.MD5Util;
@@ -48,8 +53,10 @@ import com.utils.CommonUtil;
 public class FangwuxinxiController {
     @Autowired
     private FangwuxinxiService fangwuxinxiService;
-    
-
+    @Autowired
+    private FangwuzhengmingService fangwuzhengmingService;
+    @Autowired
+    private UserService userService;
 
     /**
      * 后端列表
@@ -70,6 +77,18 @@ public class FangwuxinxiController {
     @RequestMapping("/list")
     public R list(@RequestParam Map<String, Object> params,FangwuxinxiEntity fangwuxinxi, HttpServletRequest request){
         EntityWrapper<FangwuxinxiEntity> ew = new EntityWrapper<FangwuxinxiEntity>();
+        if ("已通过".equals(params.get("shenheZhuangtai"))) {
+            ew.eq("shenhe_zhuangtai", "已通过");
+        }
+        if ("1".equals(params.get("myList")) && "huzhu".equals(request.getSession().getAttribute("tableName"))) {
+            Long uid = (Long) request.getSession().getAttribute("userId");
+            if (uid != null) {
+                UserEntity u = userService.selectById(uid);
+                if (u != null && u.getRealName() != null && !u.getRealName().trim().isEmpty()) {
+                    ew.eq("huzhuxingming", u.getRealName().trim());
+                }
+            }
+        }
 		PageUtils page = fangwuxinxiService.queryPage(params, MPUtil.sort(MPUtil.between(MPUtil.likeOrEq(ew, fangwuxinxi), params), params));
         return R.ok().put("data", page);
     }
@@ -140,8 +159,23 @@ public class FangwuxinxiController {
     @RequestMapping("/add")
     public R add(@RequestBody FangwuxinxiEntity fangwuxinxi, HttpServletRequest request){
     	fangwuxinxi.setId(new Date().getTime()+new Double(Math.floor(Math.random()*1000)).longValue());
+    	fangwuxinxi.setShenheZhuangtai("待提交证明");
+    	if (fangwuxinxi.getZhuangtai() == null || fangwuxinxi.getZhuangtai().isEmpty()) {
+    	    fangwuxinxi.setZhuangtai("待租");
+    	}
     	//ValidatorUtils.validateEntity(fangwuxinxi);
         fangwuxinxiService.insert(fangwuxinxi);
+        Long huzhuId = (Long) request.getSession().getAttribute("userId");
+        if (huzhuId != null) {
+            FangwuzhengmingEntity task = new FangwuzhengmingEntity();
+            task.setFangwuId(fangwuxinxi.getId());
+            task.setHuzhuId(huzhuId);
+            task.setStatus("待提交");
+            task.setZhengmingFiles("");
+            task.setCreateTime(new Date());
+            task.setUpdateTime(new Date());
+            fangwuzhengmingService.insert(task);
+        }
         return R.ok();
     }
 
@@ -215,6 +249,7 @@ public class FangwuxinxiController {
     @RequestMapping("/autoSort")
     public R autoSort(@RequestParam Map<String, Object> params,FangwuxinxiEntity fangwuxinxi, HttpServletRequest request,String pre){
         EntityWrapper<FangwuxinxiEntity> ew = new EntityWrapper<FangwuxinxiEntity>();
+        ew.eq("shenhe_zhuangtai", "已通过");
         Map<String, Object> newMap = new HashMap<String, Object>();
         Map<String, Object> param = new HashMap<String, Object>();
 		Iterator<Map.Entry<String, Object>> it = param.entrySet().iterator();
@@ -222,11 +257,11 @@ public class FangwuxinxiController {
 			Map.Entry<String, Object> entry = it.next();
 			String key = entry.getKey();
 			String newKey = entry.getKey();
-			if (pre.endsWith(".")) {
+			if (pre != null && pre.endsWith(".")) {
 				newMap.put(pre + newKey, entry.getValue());
 			} else if (StringUtils.isEmpty(pre)) {
 				newMap.put(newKey, entry.getValue());
-			} else {
+			} else if (pre != null) {
 				newMap.put(pre + "." + newKey, entry.getValue());
 			}
 		}

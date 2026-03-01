@@ -22,9 +22,15 @@
         </div>
       </el-col>
                                     <el-col :span="12">
-        <el-form-item class="input" v-if="type!='info'"  label="房源类型" prop="fangyuanleixing">
-          <el-input v-model="ruleForm.fangyuanleixing" 
-              placeholder="房源类型" clearable  :readonly="ro.fangyuanleixing"></el-input>
+        <el-form-item class="select" v-if="type!='info'"  label="房源类型" prop="fangyuanleixing">
+          <el-select v-model="ruleForm.fangyuanleixing" placeholder="请选择房源类型" @change="onFangyuanleixingChange">
+            <el-option
+                v-for="(item,index) in fangyuanOptions"
+                :key="index"
+                :label="item"
+                :value="item">
+            </el-option>
+          </el-select>
         </el-form-item>
         <div v-else>
           <el-form-item class="input" label="房源类型" prop="fangyuanleixing">
@@ -34,9 +40,31 @@
         </div>
       </el-col>
                                     <el-col :span="12">
-        <el-form-item class="input" v-if="type!='info'"  label="房屋户型" prop="fangwuhuxing">
-          <el-input v-model="ruleForm.fangwuhuxing" 
-              placeholder="房屋户型" clearable  :readonly="ro.fangwuhuxing"></el-input>
+        <el-form-item class="select" v-if="type!='info' && !isNonResidential && !isHezu"  label="房屋户型" prop="fangwuhuxing">
+          <el-select v-model="ruleForm.fangwuhuxing" placeholder="请选择户型">
+            <el-option
+                v-for="(item,index) in huxingOptions"
+                :key="index"
+                :label="item"
+                :value="item">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <!-- 合租：出租房间类型 + 是否独卫 -->
+        <el-form-item class="select" v-if="type!='info' && isHezu" label="出租房间类型" prop="roomType">
+          <el-select v-model="roomType" placeholder="请选择房间类型">
+            <el-option
+                v-for="(item,index) in roomTypeOptions"
+                :key="index"
+                :label="item"
+                :value="item">
+            </el-option>
+          </el-select>
+          <el-checkbox v-model="hasPrivateBath" style="margin-left:10px;">是否独卫</el-checkbox>
+        </el-form-item>
+        <!-- 非居住类：面积 / 层高 / 开间 -->
+        <el-form-item class="input" v-if="type!='info' && isNonResidential" label="面积 / 层高 / 开间" prop="nonResInfo">
+          <el-input v-model="nonResInfo" placeholder="如：120㎡ / 4.5m / 6m"></el-input>
         </el-form-item>
         <div v-else>
           <el-form-item class="input" label="房屋户型" prop="fangwuhuxing">
@@ -339,6 +367,24 @@ export default {
 	                        	                      },
                                                                                 zhuangtaiOptions: [],
                                                             huzhuxingmingOptions: [],
+                                                            // 房源类型 / 户型联动（与前台保持一致）
+                                                            fangyuanOptions: [
+                                                              '整租・普通住宅',
+                                                              '整租・公寓',
+                                                              '整租・别墅',
+                                                              '合租・次卧 / 主卧',
+                                                              '合租房源（床位）',
+                                                              '商住两用',
+                                                              '仓库 / 厂房',
+                                                              '门面 / 商铺'
+                                                            ],
+                                                            huxingOptions: [],
+                                                            isHezu: false,
+                                                            isNonResidential: false,
+                                                            roomType: '',
+                                                            roomTypeOptions: ['主卧','次卧','床位'],
+                                                            hasPrivateBath: false,
+                                                            nonResInfo: '',
                                                                                                                                                   rules: {
                   fangwubianhao: [
                                     	                                                              ],
@@ -390,6 +436,35 @@ export default {
         // 下载
     download(file){
       window.open(`${file}`)
+    },
+    // 房源类型联动
+    onFangyuanleixingChange (val) {
+      // 合租类型
+      const hezuTypes = ['合租・次卧 / 主卧', '合租房源（床位）']
+      // 非居住类型
+      const nonResTypes = ['商住两用','仓库 / 厂房','门面 / 商铺']
+
+      this.isHezu = hezuTypes.indexOf(val) !== -1
+      this.isNonResidential = nonResTypes.indexOf(val) !== -1
+
+      // 重置相关字段
+      this.ruleForm.fangwuhuxing = ''
+      this.roomType = ''
+      this.hasPrivateBath = false
+      this.nonResInfo = ''
+
+      // 住宅整租户型
+      const TYPE_HUXING_MAP = {
+        '整租・普通住宅': ['1 室 0 厅 1 卫','1 室 1 厅 1 卫','2 室 1 厅 1 卫','3 室 2 厅 2 卫'],
+        '整租・公寓': ['1 室 0 厅 1 卫','1 室 1 厅 1 卫','loft'],
+        '整租・别墅': ['3 室 2 厅 2 卫','4 室 2 厅 3 卫','5 室 3 厅 3 卫']
+      }
+
+      if (!this.isHezu && !this.isNonResidential) {
+        this.huxingOptions = TYPE_HUXING_MAP[val] || []
+      } else {
+        this.huxingOptions = []
+      }
     },
     // 初始化
     init(id,type) {
@@ -545,24 +620,17 @@ export default {
     },
         // 提交
     onSubmit() {
-                  // ${column.compare}
-                              // ${column.compare}
-                              // ${column.compare}
-                              // ${column.compare}
-                              // ${column.compare}
-                              // ${column.compare}
-                              // ${column.compare}
-                              // ${column.compare}
-                              // ${column.compare}
-                              // ${column.compare}
-                              // ${column.compare}
-                              // ${column.compare}
-                              // ${column.compare}
-                              // ${column.compare}
-                              // ${column.compare}
-                              // ${column.compare}
-                              // ${column.compare}
-                                                                                                                                                                                                                                                                                                                                                      this.$refs["ruleForm"].validate(valid => {
+      // 根据选择的房源类型组装提交字段
+      if (this.isHezu) {
+        const parts = []
+        if (this.roomType) parts.push(this.roomType)
+        parts.push(this.hasPrivateBath ? '带独卫' : '公共卫浴')
+        this.ruleForm.fangwuhuxing = parts.join(' · ')
+      } else if (this.isNonResidential) {
+        this.ruleForm.fangwuhuxing = this.nonResInfo
+      }
+
+      this.$refs["ruleForm"].validate(valid => {
         if (valid) {
           this.$http({
             url: `fangwuxinxi/${!this.ruleForm.id ? "save" : "update"}`,
@@ -747,7 +815,7 @@ export default {
 .editor{
   height: 500px;
   
-  & /deep/ .ql-container {
+  ::v-deep .ql-container {
 	  height: 310px;
   }
 }

@@ -57,11 +57,9 @@
 		methods: {
 			onLogout() {
 				let storage = this.$storage
-				let router = this.$router
 				storage.remove("Token");
-				router.replace({
-					name: "login"
-				});
+				// 统一退出到前台登录页（管理员、租客、户主都一样）
+				window.location.href = '/front/pages/login/login.html'
 			},
       			onIndexTap(){
       				window.location.href = `${this.$base.indexUrl}`
