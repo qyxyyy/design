@@ -5,7 +5,8 @@ import storage from '@/utils/storage'
 const http = axios.create({
     timeout: 1000 * 86400,
     withCredentials: true,
-    baseURL: '/springboot93c4v',
+    // 后端使用默认 context-path，统一走根路径
+    baseURL: '/',
     headers: {
         'Content-Type': 'application/json; charset=utf-8'
     }

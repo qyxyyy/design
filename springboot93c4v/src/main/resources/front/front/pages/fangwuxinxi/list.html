@@ -265,7 +265,18 @@ width: 100%;
 			</div>
 												<div class="item-list">
 				<div class="lable" :style='{"padding":"0 10px","boxShadow":"0 0 6px rgba(255,0,0,0)","margin":"3px","borderColor":"rgba(0,0,0,0)","backgroundColor":"transparent","color":"rgba(16, 15, 15, 1)","borderRadius":"0","textAlign":"right","borderWidth":"0","width":"auto","fontSize":"16px","borderStyle":"solid"}'>房源类型</div>
-				<input type="text" :style='{"boxShadow":"1px 0 3px rgba(51, 51, 51, 1)","borderColor":"#ccc","backgroundColor":"#fff","color":"rgba(51, 51, 51, 1)","borderRadius":"2px","textAlign":"center","borderWidth":"0.5px","width":"140px","fontSize":"14px","borderStyle":"solid","height":"44px"}' name="fangyuanleixing" id="fangyuanleixing" placeholder="房源类型" autocomplete="off" class="layui-input">
+        <select :style='{"boxShadow":"1px 0 3px rgba(51, 51, 51, 1)","borderColor":"#ccc","backgroundColor":"#fff","color":"rgba(51, 51, 51, 1)","borderRadius":"2px","textAlign":"center","borderWidth":"0.5px","width":"140px","fontSize":"14px","borderStyle":"solid","height":"44px"}' name="fangyuanleixing" id="fangyuanleixing" class="layui-input">
+          <option value="">全部类型</option>
+          <option value="整租・普通住宅">整租・普通住宅</option>
+          <option value="整租・公寓">整租・公寓</option>
+          <option value="整租・别墅">整租・别墅</option>
+          <option value="合租・主卧">合租・主卧</option>
+          <option value="合租・次卧">合租・次卧</option>
+          <option value="合租房源（床位）">合租房源（床位）</option>
+          <option value="商住两用">商住两用</option>
+          <option value="仓库 / 厂房">仓库 / 厂房</option>
+          <option value="门面 / 商铺">门面 / 商铺</option>
+        </select>
 			</div>
 																								<div class="item-list">
 				<div class="lable" :style='{"padding":"0 10px","boxShadow":"0 0 6px rgba(255,0,0,0)","margin":"3px","borderColor":"rgba(0,0,0,0)","backgroundColor":"transparent","color":"rgba(16, 15, 15, 1)","borderRadius":"0","textAlign":"right","borderWidth":"0","width":"auto","fontSize":"16px","borderStyle":"solid"}'>状态</div>
@@ -380,7 +391,7 @@ width: 100%;
 		    carousel.render({
 		    	elem: '#test1',
 		  				width: '100%',
-		    	height: '520px',
+		    	height: '360px',
 		    	arrow: 'hover',
 		    	anim: 'default',
 		    	autoplay: 'true',

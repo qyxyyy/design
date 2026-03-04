@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>提交证明资料</title>
+  <link rel="stylesheet" href="../../layui/css/layui.css">
+  <style>
+    body { background: #f6f7fb; font-family: "Microsoft YaHei", "PingFang SC", sans-serif; }
+    .wrap { max-width: 640px; margin: 0 auto; padding: 20px; }
+    .card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 2px 12px rgba(0,0,0,.06); }
+    .title { font-size: 16px; font-weight: 700; margin-bottom: 8px; color: #333; }
+    .sub { font-size: 13px; color: #666; margin-bottom: 16px; }
+    .btn-upload { margin-bottom: 16px; }
+    .file-list { display: flex; flex-direction: column; gap: 8px; }
+    .file-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border: 1px solid #eee; border-radius: 8px; }
+    .file-row .name { font-size: 13px; }
+    .file-row .a { color: #2A4365; cursor: pointer; margin-left: 8px; }
+    .file-row .del { color: #c62828; cursor: pointer; }
+    .btn-submit { margin-top: 20px; padding: 10px 24px; background: #2A4365; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; }
+    .btn-submit:hover { background: #1e3a52; }
+    .btn-back { margin-right: 12px; padding: 10px 20px; background: #f0f0f0; color: #333; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="title" id="houseTitle">提交证明资料</div>
+      <div class="sub">请上传该房屋的证明资料（如身份证、房产证等），提交后将进入管理员审核。</div>
+      <div class="btn-upload">
+        <button type="button" class="layui-btn layui-btn-sm" id="btnUpload">上传证明资料</button>
+        <input type="file" id="fileInput" accept="image/*,.pdf" style="display:none" />
+      </div>
+      <div class="file-list" id="fileList"></div>
+      <div style="margin-top:20px;">
+        <button type="button" class="btn-back" id="btnBack">返回待办</button>
+        <button type="button" class="btn-submit" id="btnSubmit">提交审核</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../layui/layui.js"></script>
+  <script src="../../modules/config.js"></script>
+  <script src="../../modules/http/http.js"></script>
+  <script>
+    layui.use(['http', 'jquery', 'layer'], function () {
+      var http = layui.http;
+      var $ = layui.jquery;
+      var layer = layui.layer;
+
+      var fangwuId = (function () {
+        var m = /fangwuId=(\d+)/.exec(location.search);
+        return m ? m[1] : null;
+      })();
+      if (!fangwuId) {
+        layer.msg('缺少房屋ID', { icon: 5 });
+        setTimeout(function () { window.location.href = 'zhengming-task.html'; }, 1500);
+        return;
+      }
+
+      var fileNames = [];
+
+      function loadCurrentTask() {
+        http.request('fangwuzhengming/getByFangwuId', 'get', { fangwuId: fangwuId }, function (res) {
+          var task = (res && res.data) ? res.data : null;
+          if (task && task.zhengmingFiles) {
+            fileNames = task.zhengmingFiles.split(',').filter(Boolean);
+          }
+          renderList();
+        });
+        http.request('fangwuxinxi/detail/' + fangwuId, 'get', {}, function (res) {
+          var d = (res && res.data) ? res.data : {};
+          $('#houseTitle').text('提交证明资料：' + (d.fangwubianhao || '房屋' + fangwuId));
+        });
+      }
+
+      function renderList() {
+        var html = '';
+        if (fileNames.length === 0) {
+          html = '<div style="color:#999;font-size:13px;">暂未上传，请点击上方按钮上传</div>';
+        } else {
+          fileNames.forEach(function (name, idx) {
+            var url = name.indexOf('http') === 0 ? name : (http.baseurl + 'upload/' + name);
+            html += '<div class="file-row" data-idx="' + idx + '">';
+            html += '<span class="name">' + (name.length > 40 ? name.substring(0, 40) + '...' : name) + '</span>';
+            html += '<span><a class="a" href="' + url + '" target="_blank">查看</a><a class="del" data-idx="' + idx + '">删除</a></span>';
+            html += '</div>';
+          });
+        }
+        $('#fileList').html(html);
+      }
+
+      $('#btnUpload').on('click', function () { $('#fileInput').val('').click(); });
+      $('#fileInput').on('change', function (e) {
+        var file = e.target.files && e.target.files[0];
+        if (!file) return;
+        http.upload(file, '', function (up) {
+          var name = up.file || up.fileName;
+          if (name) {
+            fileNames.push(name);
+            renderList();
+            layer.msg('上传成功', { time: 1200, icon: 6 });
+          }
+        });
+      });
+      $('#fileList').on('click', '.del', function () {
+        var idx = parseInt($(this).data('idx'), 10);
+        fileNames.splice(idx, 1);
+        renderList();
+      });
+
+      $('#btnSubmit').on('click', function () {
+        if (fileNames.length === 0) {
+          layer.msg('请至少上传一份证明资料', { icon: 5 });
+          return;
+        }
+        var zhengmingFiles = fileNames.join(',');
+        http.requestJson('fangwuzhengming/submitProof', 'post', { fangwuId: fangwuId, zhengmingFiles: zhengmingFiles }, function () {
+          layer.msg('提交成功，请等待管理员审核', { icon: 6, time: 2000 }, function () {
+            window.location.href = 'zhengming-task.html';
+          });
+        }, function (res) {
+          layer.msg((res && res.msg) ? res.msg : '提交失败', { icon: 5 });
+        });
+      });
+      $('#btnBack').on('click', function () { window.location.href = 'zhengming-task.html'; });
+
+      loadCurrentTask();
+    });
+  </script>
+</body>
+</html>

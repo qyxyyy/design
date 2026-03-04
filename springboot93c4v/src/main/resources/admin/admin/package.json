@@ -16,6 +16,8 @@
     "js-md5": "^0.7.3",
     "path-to-regexp": "^8.3.0",
     "print-js": "^1.5.0",
+    "quill": "1.3.7",
+    "svg-baker-runtime": "^1.4.7",
     "vue": "^2.6.10",
     "vue-amap": "^0.5.10",
     "vue-json-excel": "^0.3.0",

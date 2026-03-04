@@ -21,6 +21,7 @@ import center from '@/views/center'
     import shouzuxinxi from '@/views/modules/shouzuxinxi/list'
     import gonggaoxinxi from '@/views/modules/gonggaoxinxi/list'
     import zuke from '@/views/modules/zuke/list'
+    import fangwuzhengming from '@/views/modules/fangwuzhengming/list'
 
 
 //2.配置路由   注意：名字
@@ -54,6 +55,11 @@ const routes = [{
 	path: '/fangwuxinxi',
         name: '房屋信息',
         component: fangwuxinxi
+      }
+          ,{
+	path: '/fangwuzhengming',
+        name: '证明资料',
+        component: fangwuzhengming
       }
           ,{
 	path: '/weixiushuju',

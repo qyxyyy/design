@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>证明资料待办</title>
+  <link rel="stylesheet" href="../../layui/css/layui.css">
+  <style>
+    body { background: #f6f7fb; font-family: "Microsoft YaHei", "PingFang SC", sans-serif; }
+    .wrap { max-width: 900px; margin: 0 auto; padding: 20px; }
+    .title { font-size: 18px; font-weight: 700; margin-bottom: 16px; color: #333; }
+    .tip { color: #666; font-size: 13px; margin-bottom: 16px; }
+    .task-list { display: flex; flex-direction: column; gap: 12px; }
+    .task-card { background: #fff; border-radius: 12px; padding: 16px; box-shadow: 0 2px 12px rgba(0,0,0,.06); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+    .task-card .left { flex: 1; min-width: 180px; }
+    .task-card .fangwubianhao { font-weight: 700; font-size: 15px; color: #333; margin-bottom: 4px; }
+    .task-card .fangyuanleixing { font-size: 13px; color: #666; margin-bottom: 4px; }
+    .task-card .status { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 12px; }
+    .task-card .status.待提交 { background: #fff3e0; color: #e65100; }
+    .task-card .status.待审核 { background: #e3f2fd; color: #1565c0; }
+    .task-card .status.已通过 { background: #e8f5e9; color: #2e7d32; }
+    .task-card .status.已驳回 { background: #ffebee; color: #c62828; }
+    .task-card .btn { padding: 8px 16px; border-radius: 8px; font-size: 13px; border: none; cursor: pointer; }
+    .task-card .btn-primary { background: #2A4365; color: #fff; }
+    .task-card .btn-primary:hover { background: #1e3a52; }
+    .task-card .btn-default { background: #f0f0f0; color: #333; }
+    .empty { text-align: center; color: #999; padding: 40px 20px; }
+    .shenhe-beizhu { font-size: 12px; color: #c62828; margin-top: 6px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="title">证明资料待办</div>
+    <div class="tip">发布房源后需在此为对应房屋提交证明资料，审核通过后该房源才会在租客端展示。</div>
+    <div class="task-list" id="taskList"></div>
+    <div class="empty" id="empty" style="display:none;">暂无待办任务。请先<a href="../fangwuxinxi/add.html">发布出租信息</a>。</div>
+  </div>
+
+  <script src="../../layui/layui.js"></script>
+  <script src="../../modules/config.js"></script>
+  <script src="../../modules/http/http.js"></script>
+  <script>
+    layui.use(['http', 'jquery', 'layer'], function () {
+      var http = layui.http;
+      var $ = layui.jquery;
+      var layer = layui.layer;
+
+      function loadTasks() {
+        http.request('fangwuzhengming/myTasks', 'get', {}, function (res) {
+          var list = (res && res.data) ? res.data : [];
+          var html = '';
+          list.forEach(function (item) {
+            var statusVal = item.status || '待提交';
+            var statusClass = (statusVal.indexOf('已驳回') !== -1) ? '已驳回' : statusVal;
+            var canSubmit = statusVal === '待提交' || statusVal === '已驳回' || statusVal === '待审核';
+            html += '<div class="task-card">';
+            html += '<div class="left">';
+            html += '<div class="fangwubianhao">' + (item.fangwubianhao || '房屋' + item.fangwuId) + '</div>';
+            html += '<div class="fangyuanleixing">' + (item.fangyuanleixing || '') + '</div>';
+            html += '<span class="status ' + statusClass + '">' + statusVal + '</span>';
+            if (item.shenheBeizhu && item.shenheBeizhu.trim()) {
+              html += '<div class="shenhe-beizhu">驳回原因：' + item.shenheBeizhu + '</div>';
+            }
+            html += '</div>';
+            html += '<div>';
+            if (canSubmit) {
+              var btnText = statusVal === '待审核' ? '修改证明' : '去提交证明';
+              html += '<button type="button" class="btn btn-primary" data-fangwu-id="' + item.fangwuId + '">' + btnText + '</button>';
+            } else {
+              html += '<a href="../fangwuxinxi/detail.html?id=' + item.fangwuId + '" class="btn btn-default">查看房源</a>';
+            }
+            html += '</div></div>';
+          });
+          $('#taskList').html(html);
+          $('#empty').toggle(list.length === 0);
+          $('#taskList').on('click', '.btn-primary', function () {
+            var fangwuId = $(this).data('fangwu-id');
+            window.location.href = 'zhengming-submit.html?fangwuId=' + fangwuId;
+          });
+        }, function (err) {
+          if (err && err.status === 401) {
+            layer.msg('请先登录', { icon: 5 });
+            setTimeout(function () { window.location.href = '../login/login.html'; }, 1500);
+            return;
+          }
+          $('#empty').show().html('加载失败，请稍后重试。');
+        });
+      }
+      loadTasks();
+    });
+  </script>
+</body>
+</html>

@@ -6,26 +6,50 @@
   <title>房屋优点标签</title>
   <link rel="stylesheet" href="../../layui/css/layui.css">
   <style>
-    body { background:#fff; }
-    .wrap { padding: 16px; }
-    .tip { color:#666; margin: 8px 0 12px; }
-    .tags { display:flex; flex-wrap:wrap; gap: 10px; }
-    .tag { padding: 8px 12px; border:1px solid #ddd; border-radius: 999px; cursor:pointer; user-select:none; }
-    .tag.active { background:#0588e6; color:#fff; border-color:#0588e6; }
-    .bar { margin-top: 14px; display:flex; align-items:center; gap:10px; }
-    .out { margin-top: 14px; color:#333; }
+  body { background:#fff; }
+  .wrap { padding: 16px; max-width: 900px; margin: 0 auto; }
+  .tip { color:#666; margin: 8px 0 12px; font-size: 13px; }
+  .tags { display:flex; flex-wrap:wrap; gap: 10px; margin-top: 6px; }
+  .tag { padding: 8px 12px; border:1px solid #ddd; border-radius: 999px; cursor:pointer; user-select:none; font-size: 13px; }
+  .tag.active { background:#0588e6; color:#fff; border-color:#0588e6; }
+  .bar { margin-top: 14px; display:flex; align-items:center; gap:10px; }
+  .out { margin-top: 14px; color:#333; font-size: 13px; }
+  .layui-form-label { width: 90px; }
+  .layui-input-block { margin-left: 120px; }
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="layui-card">
-      <div class="layui-card-header">房屋优点标签（示例版）</div>
+      <div class="layui-card-header">房屋优点标签</div>
       <div class="layui-card-body">
-        <div class="tip">先提供“选择标签并保存”的基础体验；后续可与房源绑定、用于筛选/展示。</div>
+        <div class="tip">
+          1）请选择要配置标签的房源；2）在下方勾选或自定义标签；3）点击“保存标签”后，所选标签会在该房源详情页展示，并可用于推荐。
+        </div>
+
+        <form class="layui-form" lay-filter="formFilter">
+          <div class="layui-form-item">
+            <label class="layui-form-label">选择房源</label>
+            <div class="layui-input-block">
+              <select id="houseSelect" name="houseSelect" lay-filter="houseSelect">
+                <option value="">请选择房源</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="layui-form-item">
+            <label class="layui-form-label">新增标签</label>
+            <div class="layui-input-inline">
+              <input type="text" id="inputTagName" placeholder="如：近地铁、拎包入住" autocomplete="off" class="layui-input">
+            </div>
+            <button type="button" class="layui-btn layui-btn-sm" id="btnAddTag">新增标签</button>
+          </div>
+        </form>
+
         <div class="tags" id="tags"></div>
         <div class="bar">
           <button type="button" class="layui-btn layui-btn-sm" id="btnSave">保存标签</button>
-          <button type="button" class="layui-btn layui-btn-sm layui-btn-primary" id="btnReset">清空</button>
+          <button type="button" class="layui-btn layui-btn-sm layui-btn-primary" id="btnReset">清空选择</button>
         </div>
         <div class="out" id="out"></div>
       </div>
@@ -33,44 +57,158 @@
   </div>
 
   <script src="../../layui/layui.js"></script>
+  <script src="../../modules/config.js"></script>
+  <script src="../../modules/http/http.js"></script>
   <script>
-    layui.use(['jquery', 'layer'], function () {
+    layui.use(['http', 'jquery', 'layer', 'form'], function () {
+      var http = layui.http;
       var $ = layui.jquery;
       var layer = layui.layer;
-      var all = ['交通便利', '近地铁', '精装修', '可做饭', '可养宠物', '拎包入住', '采光好', '带阳台', '配套齐全', '物业好', '安静', '电梯房'];
+      var form = layui.form;
 
-      function loadSelected() {
-        var arr = [];
-        try { arr = JSON.parse(localStorage.getItem('huzhu_adv_tags') || '[]'); } catch(e) {}
-        return arr;
-      }
-      function render() {
-        var selected = loadSelected();
-        $('#tags').html(all.map(function (t) {
-          var active = selected.indexOf(t) !== -1 ? 'active' : '';
-          return '<span class="tag ' + active + '" data-tag="' + t + '">' + t + '</span>';
-        }).join(''));
-        $('#out').html(selected.length ? ('已选择：' + selected.join('、')) : '<span style="color:#999;">未选择标签</span>');
+      var allTags = [];
+      var selectedTagIds = [];
+      var currentHouseId = null;
+
+      // 渲染标签池
+      function renderTags() {
+        var html = allTags.map(function (t) {
+          var active = selectedTagIds.indexOf(t.id) !== -1 ? 'active' : '';
+          return '<span class="tag ' + active + '" data-id="' + t.id + '">' + t.tagName + '</span>';
+        }).join('');
+        $('#tags').html(html);
+        if (!currentHouseId) {
+          $('#out').html('<span style="color:#999;">请先在上方选择房源，再勾选标签。</span>');
+        } else if (selectedTagIds.length === 0) {
+          $('#out').html('<span style="color:#999;">当前房源尚未配置标签。</span>');
+        } else {
+          var names = [];
+          allTags.forEach(function (t) {
+            if (selectedTagIds.indexOf(t.id) !== -1) names.push(t.tagName);
+          });
+          $('#out').html('当前房源已选择：' + names.join('、'));
+        }
       }
 
+      // 加载全部启用标签
+      function loadAllTags(callback) {
+        http.request('tag/all', 'get', {}, function (res) {
+          allTags = (res && res.data) ? res.data : [];
+          if (typeof callback === 'function') callback();
+        }, function () {
+          allTags = [];
+          renderTags();
+          layer.msg('加载标签失败，请稍后重试', {icon:5});
+        });
+      }
+
+      // 加载当前房源的标签
+      function loadHouseTags(houseId) {
+        if (!houseId) {
+          selectedTagIds = [];
+          renderTags();
+          return;
+        }
+        http.request('tag/houseTags', 'get', { houseId: houseId }, function (res) {
+          var list = (res && res.data) ? res.data : [];
+          selectedTagIds = list.map(function (t) { return t.id; });
+          renderTags();
+        }, function () {
+          selectedTagIds = [];
+          renderTags();
+        });
+      }
+
+      // 加载当前户主的房源列表（myList=1）
+      function loadMyHouses() {
+        http.request('fangwuxinxi/list', 'get', { page: 1, limit: 1000, myList: 1 }, function (res) {
+          var list = (res && res.data && res.data.list) ? res.data.list : [];
+          var options = '<option value="">请选择房源</option>';
+          list.forEach(function (it) {
+            var text = (it.fangwubianhao || ('房源' + it.id)) + (it.fangwuhuxing ? (' / ' + it.fangwuhuxing) : '');
+            options += '<option value="' + it.id + '">' + text + '</option>';
+          });
+          $('#houseSelect').html(options);
+          form.render('select', 'formFilter');
+        }, function (err) {
+          if (err && err.status === 401) {
+            layer.msg('请先登录', {icon:5});
+            setTimeout(function(){ window.location.href = '../login/login.html'; }, 1500);
+            return;
+          }
+          $('#houseSelect').html('<option value="">加载房源失败</option>');
+          form.render('select', 'formFilter');
+        });
+      }
+
+      // 绑定标签点击
       $('#tags').on('click', '.tag', function () {
+        if (!currentHouseId) {
+          layer.msg('请先选择要配置的房源', {icon:5});
+          return;
+        }
+        var id = parseInt($(this).attr('data-id'), 10);
+        var idx = selectedTagIds.indexOf(id);
+        if (idx === -1) selectedTagIds.push(id);
+        else selectedTagIds.splice(idx, 1);
         $(this).toggleClass('active');
+        renderTags();
       });
 
+      // 新增自定义标签
+      $('#btnAddTag').on('click', function () {
+        var name = $('#inputTagName').val().trim();
+        if (!name) {
+          layer.msg('请输入标签名称', {icon:5});
+          return;
+        }
+        http.requestJson('tag/create', 'post', { tagName: name }, function () {
+          $('#inputTagName').val('');
+          loadAllTags(function () {
+            // 新增后自动选中该标签（如果已经选了房源）
+            if (currentHouseId) {
+              // 再次加载该房源标签，保持一致
+              loadHouseTags(currentHouseId);
+            } else {
+              renderTags();
+            }
+          });
+        }, function (res) {
+          layer.msg((res && res.msg) ? res.msg : '新增标签失败', {icon:5});
+        });
+      });
+
+      // 保存当前房源标签
       $('#btnSave').on('click', function () {
-        var selected = [];
-        $('#tags .tag.active').each(function () { selected.push($(this).attr('data-tag')); });
-        localStorage.setItem('huzhu_adv_tags', JSON.stringify(selected));
-        layer.msg('已保存', { time: 1200, icon: 6 });
-        render();
+        if (!currentHouseId) {
+          layer.msg('请先选择要配置的房源', {icon:5});
+          return;
+        }
+        http.requestJson('tag/saveForHouse', 'post', {
+          houseId: currentHouseId,
+          tagIds: selectedTagIds
+        }, function () {
+          layer.msg('标签已保存', {icon:6, time:1500});
+        }, function (res) {
+          layer.msg((res && res.msg) ? res.msg : '保存失败', {icon:5});
+        });
       });
 
+      // 清空当前房源选择
       $('#btnReset').on('click', function () {
-        localStorage.setItem('huzhu_adv_tags', JSON.stringify([]));
-        render();
+        selectedTagIds = [];
+        renderTags();
       });
 
-      render();
+      // 监听房源选择
+      form.on('select(houseSelect)', function (data) {
+        currentHouseId = data.value ? parseInt(data.value, 10) : null;
+        loadHouseTags(currentHouseId);
+      });
+
+      // 初始化：加载标签池和房源列表
+      loadAllTags(renderTags);
+      loadMyHouses();
     });
   </script>
 </body>
